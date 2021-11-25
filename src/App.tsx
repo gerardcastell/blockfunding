@@ -1,41 +1,35 @@
-import './App.css';
+import { useEffect, useState } from "react";
 import Web3 from 'web3';
-import { useState, useEffect } from 'react';
-
-declare global {
-  interface Window {
-    ethereum: any;
-  }
-}
+import './App.css';
+import { IAccount } from './components/IAccount';
+import TransactionForm from './components/TransactionForm';
 
 function App() {
-  const [accounts, setAccounts] = useState<string[]>([]);
-  if (typeof window.ethereum !== 'undefined') {
-    console.log('MetaMask is installed', window.ethereum);
-  }
+
+  const [accounts, setAccounts] = useState<IAccount[]>([]);
+  const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
 
   useEffect(() => {
-    const web3 = new Web3('http://localhost:8545');
-
-    console.log('On mount');
-    async function getAccounts() {
-      const accs = await web3.eth.getAccounts();
-      setAccounts(accs);
-    }
-    getAccounts();
+    setAccounts([]);
+    fetchData();
   }, []);
 
+
+  async function fetchData(): Promise<void> {
+    const accountNumbers = await web3.eth.getAccounts();
+    for (const accountNumber of accountNumbers) {
+      const balance = await web3.eth.getBalance(accountNumber);
+      setAccounts(accounts => [...accounts, { address: accountNumber, balance}])
+    };
+  };
+
   return (
-    <div className='App'>
-      <header className='App-header'>
-        <h3>Account List:</h3>
-        {accounts?.map((acc, idx) => (
-          <p style={{ fontSize: '12px' }} key={idx}>
-            {acc}
-          </p>
-        ))}
+    <div className="App">
+      <header className="App-header">
+        <TransactionForm web3={web3} accounts={accounts}/>
       </header>
     </div>
+
   );
 }
 
