@@ -12,9 +12,11 @@ type Inputs = {
 export default function TransactionForm({
   sendTransaction,
   accounts,
+  userAccounts
 }: {
   sendTransaction(transactionConfig: TransactionConfig): PromiEvent<TransactionReceipt>;
   accounts: IAccount[];
+  userAccounts: IAccount[]
 }) {
   const { register, handleSubmit } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -43,7 +45,7 @@ export default function TransactionForm({
     <form onSubmit={handleSubmit(onSubmit)} key='origin'>
       <select {...register('origin')}>
         <option value=''></option>
-        {accounts
+        {userAccounts
           .filter((account) => account.address)
           .map((account) => {
             return (
