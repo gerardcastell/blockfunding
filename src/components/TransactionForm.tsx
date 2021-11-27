@@ -1,6 +1,6 @@
+import { TransactionConfig, PromiEvent, TransactionReceipt } from 'web3-core';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import Web3 from 'web3';
-import { ethToWei, weiToEth } from '../shared/utils';
+import { ethToWei, weiToEth } from '../shared/exchanges';
 import { IAccount } from './IAccount';
 
 type Inputs = {
@@ -10,16 +10,16 @@ type Inputs = {
 };
 
 export default function TransactionForm({
-  web3,
+  sendTransaction,
   accounts,
 }: {
-  web3: Web3 | undefined;
+  sendTransaction(transactionConfig: TransactionConfig): PromiEvent<TransactionReceipt>;
   accounts: IAccount[];
 }) {
   const { register, handleSubmit } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const receipt = await web3?.eth.sendTransaction({
+      const receipt = await sendTransaction({
         from: data.origin,
         to: data.destination,
         value: ethToWei(data.amount),

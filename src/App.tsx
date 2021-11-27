@@ -41,11 +41,8 @@ function App() {
 
   return (
     <div className='App'>
-      {accounts.map((acc, idx) => (
-        <p key='idx'>acc</p>
-      ))}
       <header className='App-header'>
-        <TransactionForm web3={web3} accounts={accounts} />
+        <TransactionForm sendTransaction={web3.eth.sendTransaction} accounts={accounts} />
       </header>
     </div>
   );
