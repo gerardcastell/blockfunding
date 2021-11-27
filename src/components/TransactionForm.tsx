@@ -1,6 +1,6 @@
 import { TransactionConfig, PromiEvent, TransactionReceipt } from 'web3-core';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { ethToWei, weiToEth } from '../shared/exchanges';
+import { ethToWei, weiToEth } from '../utils/exchanges';
 import { IAccount } from './IAccount';
 
 type Inputs = {
