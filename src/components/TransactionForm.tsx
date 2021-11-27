@@ -4,8 +4,8 @@ import { ethToWei, weiToEth } from '../shared/exchanges';
 import { IAccount } from './IAccount';
 
 type Inputs = {
-  origin: string;
-  destination: string;
+  originAccount: string;
+  destinationAccount: string;
   amount: string;
 };
 
@@ -18,12 +18,12 @@ export default function TransactionForm({
   accounts: IAccount[];
   userAccounts: IAccount[]
 }) {
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, watch} = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const receipt = await sendTransaction({
-        from: data.origin,
-        to: data.destination,
+        from: data.originAccount,
+        to: data.destinationAccount,
         value: ethToWei(data.amount),
         // gas?: number | string;
         // gasPrice?: number | string | BN;
@@ -40,29 +40,30 @@ export default function TransactionForm({
     }
   };
 
+
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <form onSubmit={handleSubmit(onSubmit)} key='origin'>
-      <select {...register('origin')}>
+      <select {...register('originAccount')}>
         <option value=''></option>
         {userAccounts
           .filter((account) => account.address)
           .map((account) => {
             return (
-              <option value={account.address}>{`${account.address} (${weiToEth(
+              <option key={account.address} value={account.address}>{`${account.address} (${weiToEth(
                 account.balance
               )} ETH)`}</option>
             );
           })}
       </select>
       <br />
-      <select {...register('destination')} key='destination'>
+      <select {...register('destinationAccount')} key='destination'>
         <option value=''></option>
         {accounts
-          .filter((account) => account.address !== origin)
+          .filter((account) => account.address !== watch("originAccount"))
           .map((account) => {
             return (
-              <option value={account.address}>{`${account.address} (${weiToEth(
+              <option key={account.address} value={account.address}>{`${account.address} (${weiToEth(
                 account.balance
               )} ETH)`}</option>
             );

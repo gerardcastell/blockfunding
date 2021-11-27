@@ -13,13 +13,14 @@ function App() {
   const [accounts, setAccounts] = useState<IAccount[]>([]);
   const [userAccounts, setUserAccounts ] = useState<IAccount[]>([]);
 
+  
   const ganacheWeb3 = new Web3('http://localhost:8545');
   useEffect(() => {
     fetchData(ganacheWeb3, setAccounts);
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
-      fetchData(window.web3, setUserAccounts)
+      fetchData(window.web3, setUserAccounts);
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
