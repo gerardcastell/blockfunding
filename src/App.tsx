@@ -20,15 +20,19 @@ function App() {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
       fetchData(window.web3, setUserAccounts);
-      window.web3.eth.subscribe('newBlockHeaders', (err, result) => {
-        console.log('Err: ', err);
-        console.log('Result: ', result);
-        fetchData(window.web3, setUserAccounts);
-        fetchData(ganacheWeb3, setAccounts);
-      });
+      window.ethereum.on('connect', (accounts: any) =>
+        console.log('Connect', accounts)
+      );
+      window.ethereum.on('accountsChanged', (event: any) =>
+        console.log('accountsChanged', event)
+      );
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
+    return () => {
+      window.ethereum.removeListener('connect');
+      window.ethereum.removeListener('accountsChanged');
+    };
   }, []);
 
   async function fetchData(
@@ -36,6 +40,10 @@ function App() {
     setter: React.Dispatch<React.SetStateAction<IAccount[]>>
   ): Promise<void> {
     const accountNumbers = await web3.eth.getAccounts();
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+    console.log('Accounts ethereum', accounts);
     setter(() => []);
     for (const accountNumber of accountNumbers) {
       const balance = await web3.eth.getBalance(accountNumber);
