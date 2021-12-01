@@ -11,9 +11,8 @@ declare global {
 }
 function App() {
   const [accounts, setAccounts] = useState<IAccount[]>([]);
-  const [userAccounts, setUserAccounts ] = useState<IAccount[]>([]);
+  const [userAccounts, setUserAccounts] = useState<IAccount[]>([]);
 
-  
   const ganacheWeb3 = new Web3('http://localhost:8545');
   useEffect(() => {
     fetchData(ganacheWeb3, setAccounts);
@@ -21,26 +20,37 @@ function App() {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
       fetchData(window.web3, setUserAccounts);
+      window.web3.eth.subscribe('newBlockHeaders', (err, result) => {
+        console.log('Err: ', err);
+        console.log('Result: ', result);
+        fetchData(window.web3, setUserAccounts);
+        fetchData(ganacheWeb3, setAccounts);
+      });
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
   }, []);
 
-  async function fetchData(web3: Web3, setter: React.Dispatch<React.SetStateAction<IAccount[]>>): Promise<void> {
+  async function fetchData(
+    web3: Web3,
+    setter: React.Dispatch<React.SetStateAction<IAccount[]>>
+  ): Promise<void> {
     const accountNumbers = await web3.eth.getAccounts();
-    for (const accountNumber of accountNumbers) { 
+    setter(() => []);
+    for (const accountNumber of accountNumbers) {
       const balance = await web3.eth.getBalance(accountNumber);
-      setter((accounts) => [
-        ...accounts,
-        { address: accountNumber, balance },
-      ]);
+      setter((accounts) => [...accounts, { address: accountNumber, balance }]);
     }
   }
 
   return (
     <div className='App'>
       <header className='App-header'>
-        <TransactionForm sendTransaction={ganacheWeb3.eth.sendTransaction} accounts={accounts} userAccounts={userAccounts}/>
+        <TransactionForm
+          sendTransaction={ganacheWeb3.eth.sendTransaction}
+          accounts={accounts}
+          userAccounts={userAccounts}
+        />
       </header>
     </div>
   );

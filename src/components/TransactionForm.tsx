@@ -12,13 +12,15 @@ type Inputs = {
 export default function TransactionForm({
   sendTransaction,
   accounts,
-  userAccounts
+  userAccounts,
 }: {
-  sendTransaction(transactionConfig: TransactionConfig): PromiEvent<TransactionReceipt>;
+  sendTransaction(
+    transactionConfig: TransactionConfig
+  ): PromiEvent<TransactionReceipt>;
   accounts: IAccount[];
-  userAccounts: IAccount[]
+  userAccounts: IAccount[];
 }) {
-  const { register, handleSubmit, watch} = useForm<Inputs>();
+  const { register, handleSubmit, watch } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const receipt = await sendTransaction({
@@ -34,12 +36,10 @@ export default function TransactionForm({
         // chain?: string;
         // hardfork?: string;
       });
-      receipt?.status && alert('Transfer done');
     } catch (error) {
       alert(error);
     }
   };
-
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
@@ -50,9 +50,9 @@ export default function TransactionForm({
           .filter((account) => account.address)
           .map((account) => {
             return (
-              <option key={account.address} value={account.address}>{`${account.address} (${weiToEth(
-                account.balance
-              )} ETH)`}</option>
+              <option key={account.address} value={account.address}>{`${
+                account.address
+              } (${weiToEth(account.balance)} ETH)`}</option>
             );
           })}
       </select>
@@ -60,12 +60,12 @@ export default function TransactionForm({
       <select {...register('destinationAccount')} key='destination'>
         <option value=''></option>
         {accounts
-          .filter((account) => account.address !== watch("originAccount"))
+          .filter((account) => account.address !== watch('originAccount'))
           .map((account) => {
             return (
-              <option key={account.address} value={account.address}>{`${account.address} (${weiToEth(
-                account.balance
-              )} ETH)`}</option>
+              <option key={account.address} value={account.address}>{`${
+                account.address
+              } (${weiToEth(account.balance)} ETH)`}</option>
             );
           })}
       </select>
