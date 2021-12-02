@@ -16,6 +16,7 @@
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.20.2",
     "react-scripts": "4.0.3",
+    "solc": "^0.8.10",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1",
     "web3": "^1.6.1"
@@ -25,8 +26,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "compile:contract": "solcjs --bin --abi -o ./solc ./smart-contract/SimplePayment.sol",
+    "deploy:contract": "ts-node ./src/deployContract.ts",
     "blockchain-up": "ganache-cli -b feature 20 -m 'test test test test test test test test junk'",
-    "run:all": "concurrently 'npm run blockchain-up' 'npm run start'"
+    "run:all": "concurrently 'npm run blockchain-up' 'npm run compile:contract' 'npm run start'"
   },
   "eslintConfig": {
     "extends": [

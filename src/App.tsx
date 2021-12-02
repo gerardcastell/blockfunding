@@ -14,6 +14,7 @@ function App() {
   const [userAccounts, setUserAccounts] = useState<IAccount[]>([]);
 
   const ganacheWeb3 = new Web3('http://localhost:8545');
+
   useEffect(() => {
     fetchData(ganacheWeb3, setAccounts);
     if (window.web3) {
