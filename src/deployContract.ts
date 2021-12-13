@@ -13,7 +13,7 @@ function run(): void {
     console.log('Deploying smart contract');
     const contract = new ganacheWeb3.eth.Contract(
       JSON.parse(fs.readFileSync(abiPath).toString()),
-      '0x1234567890123456789012345678901234567891',
+      '0x1234567890123456789012345678901234567891', // Default from address (address of the smart contract to call)
       { data }
     );
     deployContract(contract, data);
@@ -26,12 +26,12 @@ function deployContract(contract: Contract, data: string) {
   contract
     .deploy({data})
     .send({
-      from: '0x1234567890123456789012345678901234567891',
+      from: '0xe553eE64bbFF7B2D3012efB884e0887Aa364691C',
       gas: 1500000,
       gasPrice: '30000000000000',
     })
     .then(function (newContractInstance) {
-      console.log(newContractInstance.options.address); // instance with the new contract address
+      console.log(`Contract deployed with address: ${newContractInstance.options.address}`); // instance with the new contract address
     })
     .catch(function (error) {
       throw new Error(error);
