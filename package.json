@@ -29,7 +29,7 @@
     "compile:contract": "solcjs --bin --abi -o ./solc ./smart-contract/SimplePayment.sol",
     "deploy:contract": "ts-node ./src/deployContract.ts",
     "blockchain-up": "ganache-cli -b feature 20 -m 'test test test test test test test test junk'",
-    "run:all": "concurrently 'npm run blockchain-up' 'npm run compile:contract' 'npm run start'"
+    "run:all": "BROWSER=firefox concurrently 'npm run blockchain-up' 'npm run compile:contract' 'npm run deploy:contract' 'npm run start'"
   },
   "eslintConfig": {
     "extends": [
