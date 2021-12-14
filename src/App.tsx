@@ -3,7 +3,6 @@ import Web3 from 'web3';
 import './App.css';
 import { IAccount } from './components/IAccount';
 import TransactionForm from './components/TransactionForm';
-import Deployer from './deployContract';
 declare global {
   interface Window {
     web3: Web3;
@@ -16,11 +15,7 @@ function App() {
 
   const ganacheWeb3 = new Web3('http://localhost:8545');
 
-  const deployer = new Deployer();
-
-  
   useEffect(() => {
-    deployer.deploy();
     fetchData(ganacheWeb3, setAccounts);
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
@@ -64,7 +59,6 @@ function App() {
           eth={ganacheWeb3.eth}
           accounts={accounts}
           userAccounts={userAccounts}
-          contract={deployer.contract}
         />
       </header>
     </div>
