@@ -23,9 +23,11 @@ function App() {
       window.ethereum.on('connect', (accounts: any) =>
         console.log('Connect', accounts)
       );
-      window.ethereum.on('accountsChanged', (event: any) =>
-        console.log('accountsChanged', event)
-      );
+      if (window.ethereum.isConnected()) {
+        window.ethereum.on('accountsChanged', (event: any) =>
+          console.log('accountsChanged', event)
+        );
+      }
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
