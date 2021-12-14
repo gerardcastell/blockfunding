@@ -1,41 +1,31 @@
-import { TransactionConfig, PromiEvent, TransactionReceipt } from 'web3-core';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ethToWei, weiToEth } from '../utils/exchanges';
 import { IAccount } from './IAccount';
+import { Eth } from 'web3-eth';
+import { Contract } from 'web3-eth-contract';
+
 
 type Inputs = {
   originAccount: string;
-  destinationAccount: string;
+  smartContractAddress: string;
   amount: string;
 };
 
 export default function TransactionForm({
-  sendTransaction,
+  eth,
   accounts,
   userAccounts,
+  contract
 }: {
-  sendTransaction(
-    transactionConfig: TransactionConfig
-  ): PromiEvent<TransactionReceipt>;
+  eth: Eth,
   accounts: IAccount[];
   userAccounts: IAccount[];
+  contract: Contract | undefined
 }) {
   const { register, handleSubmit, watch } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const receipt = await sendTransaction({
-        from: data.originAccount,
-        to: data.destinationAccount,
-        value: ethToWei(data.amount),
-        // gas?: number | string;
-        // gasPrice?: number | string | BN;
-        // data?: string;
-        // nonce?: number;
-        // chainId?: number;
-        // common?: Common;
-        // chain?: string;
-        // hardfork?: string;
-      });
+      console.log(contract!.options.address)
     } catch (error) {
       alert(error);
     }
@@ -50,25 +40,18 @@ export default function TransactionForm({
           .filter((account) => account.address)
           .map((account) => {
             return (
-              <option key={account.address} value={account.address}>{`${
-                account.address
-              } (${weiToEth(account.balance)} ETH)`}</option>
+              <option key={account.address} value={account.address}>{`${account.address
+                } (${weiToEth(account.balance)} ETH)`}</option>
             );
           })}
       </select>
       <br />
-      <select {...register('destinationAccount')} key='destination'>
-        <option value=''></option>
-        {accounts
-          .filter((account) => account.address !== watch('originAccount'))
-          .map((account) => {
-            return (
-              <option key={account.address} value={account.address}>{`${
-                account.address
-              } (${weiToEth(account.balance)} ETH)`}</option>
-            );
-          })}
-      </select>
+      <input
+        {...register('smartContractAddress')}
+        placeholder='Smart contract address'
+        autoComplete='false'
+        key='smartContractAddress'
+      />
       <br />
       <input
         {...register('amount')}
