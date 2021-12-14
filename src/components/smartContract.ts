@@ -1,7 +1,8 @@
 import Web3 from 'web3';
+import {AbiItem} from 'web3-utils';
 
 const web3 = new Web3("http://localhost:8545");
-const abi : any = [ //TODO: TYPE
+const abi : AbiItem[] = [ 
   {
     inputs: [],
     name: 'balanceReceived',
