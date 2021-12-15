@@ -3,12 +3,23 @@
 pragma solidity >=0.8.10;
 
 contract CrowdFunding {
+    // Leader of the crowdfunding campaign
     address public owner;
+
+    // The amount of wei raised so far
     uint256 public balance;
+
+    // Amount of founds the project founder wants to collect
     uint256 public ethGoal;
+
+    // Deadline in seconds (unix timestamp)
     uint256 public deadline;
+
+    // Amount that every user has contributed
     mapping(address => uint256) public balanceReceived;
-    mapping(address => mapping(uint256 => bool)) public isDonationClaimed; // Amount of ETH each org can claim per claimable event
+
+    // Amount of ETH each org can claim per claimable event
+    mapping(address => mapping(uint256 => bool)) public isDonationClaimed;
 
     constructor(uint256 _days, uint256 _ethGoal) {
         owner = msg.sender;
@@ -57,7 +68,7 @@ contract CrowdFunding {
         assert(balanceReceived[msg.sender] >= uint64(msg.value));
     }
 
-    function claim(uint256 _amount) public notInTime {
+    function claim(uint256 _amount) public notInTime isNotAchieved {
         // Check if the user has already claimed his funds
         require(
             isDonationClaimed[msg.sender][_amount] == false,
@@ -67,7 +78,6 @@ contract CrowdFunding {
         _amount = _amount * 1000000000000000000; // Convert to wei
         require(balanceReceived[msg.sender] - _amount >= 0, "Not enough funds");
 
-        // if (balanceReceived[msg.sender] - _amount >= 0) {
         balanceReceived[msg.sender] -= _amount;
 
         if (balanceReceived[msg.sender] == 0) {
@@ -77,11 +87,9 @@ contract CrowdFunding {
 
         balance -= _amount;
 
-        // Send funds to the donator
+        // Send funds to the donator address
         payable(msg.sender).transfer(_amount);
     }
-
-    // TODO SC queda bloquejat quan el deadline ha expirat
 
     function withdrawFunds(address payable _to) public isOwner isAchieved {
         _to.transfer(address(this).balance);
