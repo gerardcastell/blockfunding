@@ -20,7 +20,7 @@ export default function MakeDonation({ userAccount }: { userAccount: IAccount })
 
   return (
     <>
-      <h1>Crowdfunding project</h1>
+      <h1>PROJECT TITLE</h1>
       <ProgressBar balance={weiToEth(balance.toString())} goal={100}></ProgressBar>
       <TransactionForm userAccount={userAccount} balanceSetter={setStateBalance} />
     </>

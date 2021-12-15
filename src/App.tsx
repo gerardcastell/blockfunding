@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import './App.css';
 import Header from './components/shared/Header';
 import { IAccount } from './components/shared/IAccount';
-import { fetchData } from './routes/AccountsFetch';
+import { fetchAccounts } from './utils/fetchAccounts';
 import ContractsList from './routes/ContractsList';
 import MakeDonation from './routes/MakeDonation';
 
@@ -22,7 +22,7 @@ export default function App() {
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
-      fetchData(window.web3, setMetaMaskAccounts);
+      fetchAccounts(window.web3, setMetaMaskAccounts);
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
@@ -34,7 +34,7 @@ export default function App() {
         <Header />
         <Routes>
           <Route path="/" element={<ContractsList />} />
-          <Route path="about" element={<MakeDonation userAccount={metaMaskAccounts[0]}/>} />
+          <Route path="/:id/donate" element={<MakeDonation userAccount={metaMaskAccounts[0]}/>} />
         </Routes>
       </BrowserRouter>
     </>

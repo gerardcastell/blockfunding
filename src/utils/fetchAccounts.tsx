@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import { IAccount } from "../components/shared/IAccount";
 
-export async function fetchData(
+export async function fetchAccounts(
     web3: Web3,
     setter: React.Dispatch<React.SetStateAction<IAccount[]>>
 ): Promise<void> {

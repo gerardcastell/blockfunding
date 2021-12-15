@@ -8,8 +8,6 @@ export default function ProgressBar({ balance, goal }: { balance: number, goal: 
     }; //TODO: Move to css
 
     const [percent, setPercent] = useState<number>(balance);
-    const [color, setColor] = useState<string>('#ec5990');
-    // const colorMap = ['#FE8C6A', '#3FC7FA', '#85D262'];
 
     useEffect(() => {
         setPercent((balance / goal));
@@ -18,7 +16,7 @@ export default function ProgressBar({ balance, goal }: { balance: number, goal: 
 
     return (
         <>
-            <Line style={containerStyle} percent={percent * 100} strokeWidth={1} strokeColor={color}></Line>
+            <Line style={containerStyle} percent={percent * 100} strokeWidth={1} strokeColor={"#ec5990"}></Line>
             <div>{`${balance} of ${goal} ETH funded`}</div>
         </>
     )
