@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Web3 from 'web3';
 import './App.css';
+import Header from './components/Header';
 import { IAccount } from './components/IAccount';
 import TransactionForm from './components/TransactionForm';
 declare global {
@@ -40,7 +41,8 @@ function App() {
   return (
     <div className='App'>
       <header className='App-header'>
-        <TransactionForm metaMaskAccount={userAccounts[0]}/>
+        <Header />
+        <TransactionForm metaMaskAccount={userAccounts[0]} />
       </header>
     </div>
   );
