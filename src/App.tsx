@@ -1,51 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Web3 from 'web3';
 import './App.css';
-import Header from './components/Header';
-import { IAccount } from './components/IAccount';
-import TransactionForm from './components/TransactionForm';
+import Header from './components/shared/Header';
+import { IAccount } from './components/shared/IAccount';
+import { fetchData } from './routes/AccountsFetch';
+import ContractsList from './routes/ContractsList';
+import MakeDonation from './routes/MakeDonation';
+
 declare global {
   interface Window {
     web3: Web3;
     ethereum: any;
   }
 }
-function App() {
-  const [userAccounts, setUserAccounts] = useState<IAccount[]>([]);
+
+export default function App() {
+  const [metaMaskAccounts, setMetaMaskAccounts] = useState<IAccount[]>([]);
 
   useEffect(() => {
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
-      fetchData(window.web3, setUserAccounts);
+      fetchData(window.web3, setMetaMaskAccounts);
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
   }, []);
 
-  async function fetchData(
-    web3: Web3,
-    setter: React.Dispatch<React.SetStateAction<IAccount[]>>
-  ): Promise<void> {
-    const accountNumbers = await web3.eth.getAccounts();
-    await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
-    setter(() => []); // TODO: REMOVE THIS (used to not accumulate accounts when developing)
-    for (const accountNumber of accountNumbers) {
-      const balance = await web3.eth.getBalance(accountNumber);
-      setter((accounts) => [...accounts, { address: accountNumber, balance }]);
-    }
-  }
-
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <>
+      <BrowserRouter>
         <Header />
-        <TransactionForm metaMaskAccount={userAccounts[0]} />
-      </header>
-    </div>
+        <Routes>
+          <Route path="/" element={<ContractsList />} />
+          <Route path="about" element={<MakeDonation userAccount={metaMaskAccounts[0]}/>} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
-
-export default App;
