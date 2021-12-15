@@ -3,6 +3,7 @@ import { ethToWei, weiToEth } from '../utils/exchanges';
 import { IAccount } from './IAccount';
 import { smartContract } from './smartContract';
 import { useEffect, useState } from 'react';
+import ProgressBar from './ProgressBar';
 
 type Inputs = {
   originAccount: string;
@@ -11,20 +12,14 @@ type Inputs = {
 };
 
 
-export default function TransactionForm({
-  metaMaskAccount,
-}: {
-  metaMaskAccount: IAccount;
-}) {
-
-
+export default function TransactionForm({metaMaskAccount}: {metaMaskAccount: IAccount}) {
   useEffect(() => {
-    getBalance();
+    setStateBalance();
   }, []);
 
   const [balance, setBalance] = useState(0);
 
-  async function getBalance(): Promise<void> {
+  async function setStateBalance(): Promise<void> {
     const balance = await smartContract.methods.getBalance().call();
     setBalance(balance);
   }
@@ -36,6 +31,7 @@ export default function TransactionForm({
       .then(function (receipt: any) {
         console.log(receipt)
       });
+      setStateBalance();
     } catch (error) {
       alert(error);
     }
@@ -44,8 +40,9 @@ export default function TransactionForm({
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <>
-      <div>SC balance: {weiToEth(balance.toString())} ETH</div>
-      <div>{`${metaMaskAccount?.address} (${weiToEth(metaMaskAccount?.balance)} ETH)`}</div>
+      <h1>Crowdfunding project</h1>
+      <ProgressBar balance={weiToEth(balance.toString())} goal={100}></ProgressBar>
+      {/* <div>{`${metaMaskAccount?.address} (${weiToEth(metaMaskAccount?.balance)} ETH)`}</div> */}
       <form onSubmit={handleSubmit(onSubmit)} key='origin'>
         <br />
         <input
@@ -54,7 +51,7 @@ export default function TransactionForm({
           autoComplete='false'
           key='amount'
         />
-        <button type="submit">Send to SC</button>
+        <button type="submit">Donate</button>
       </form>
     </>
   );
