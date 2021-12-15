@@ -8,12 +8,12 @@ export default function ProgressBar({ balance, goal }: { balance: number, goal: 
     }; //TODO: Move to css
 
     const [percent, setPercent] = useState<number>(balance);
-    const [color, setColor] = useState<string>('#FE8C6A');
-    const colorMap = ['#FE8C6A', '#3FC7FA', '#85D262'];
+    const [color, setColor] = useState<string>('#ec5990');
+    // const colorMap = ['#FE8C6A', '#3FC7FA', '#85D262'];
 
     useEffect(() => {
         setPercent((balance / goal));
-        setColor(colorMap[parseInt((percent*100).toString())]);
+        // setColor(colorMap[parseInt((percent*100).toString())]);
     }, [balance])
 
     return (

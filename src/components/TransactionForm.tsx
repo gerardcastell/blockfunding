@@ -24,7 +24,7 @@ export default function TransactionForm({metaMaskAccount}: {metaMaskAccount: IAc
     setBalance(balance);
   }
 
-  const { register, handleSubmit, watch } = useForm<Inputs>();
+  const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       await smartContract.methods.receiveMoney().send({ from: metaMaskAccount.address, value: ethToWei(data.amount) })
@@ -32,6 +32,7 @@ export default function TransactionForm({metaMaskAccount}: {metaMaskAccount: IAc
         console.log(receipt)
       });
       setStateBalance();
+      reset({amount: ""});
     } catch (error) {
       alert(error);
     }
