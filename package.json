@@ -2,6 +2,7 @@
   "name": "dapp-crowdfunding",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@mui/icons-material": "^5.2.0",
     "@mui/material": "^5.2.1",
@@ -12,11 +13,14 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "rc-progress": "^3.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.20.2",
     "react-scripts": "4.0.3",
+    "solc": "^0.8.10",
     "typescript": "^4.1.2",
+    "wait-on": "^6.0.0",
     "web-vitals": "^1.0.1",
     "web3": "^1.6.1"
   },
@@ -25,8 +29,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "compile:contract": "solcjs --bin --abi -o ./solc ./smart-contract/SimplePayment.sol",
+    "deploy:contract": "node ./deployContract.js",
     "blockchain-up": "ganache-cli -b feature 20 -m 'test test test test test test test test junk'",
-    "run:all": "concurrently 'npm run blockchain-up' 'npm run start'"
+    "run:all": "BROWSER=firefox concurrently 'npm run compile:contract && npm run blockchain-up' 'wait-on tcp:127.0.0.1:8545 && npm run deploy:contract' 'npm run start'"
   },
   "eslintConfig": {
     "extends": [

@@ -21,3 +21,74 @@
     transform: rotate(360deg);
   }
 }
+
+.h1 {
+  margin-top: 80px;
+  color: white;
+  font-size: 25px;
+  padding-bottom: 0px;
+}
+
+.form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.p {
+  color: #bf1650;
+  text-align: center;
+}
+
+select,
+input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid white;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+button[type="submit"],
+.button {
+  position: relative;
+  background: #ec5990;
+  color: white;
+  text-transform: uppercase;
+  border: none;
+  margin-top: 20px;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: 100;
+  letter-spacing: 4px;
+  display: block;
+  appearance: none;
+  border-radius: 4px;
+  width: 100%;
+  font-weight: lighter;
+  transition: 0.3s all;
+}
+
+.buttonBlack {
+  background: black;
+  border: 1px solid white;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+}
+
+button[type="submit"]:hover,
+button[type="button"]:hover {
+  background: #bf1650;
+  color: white;
+}
+
+button[type="submit"]:active {
+  transition: 0.3s all;
+  top: 2px;
+}

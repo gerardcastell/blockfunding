@@ -1,41 +1,38 @@
-import { TransactionConfig, PromiEvent, TransactionReceipt } from 'web3-core';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ethToWei, weiToEth } from '../utils/exchanges';
 import { IAccount } from './IAccount';
+import { smartContract } from './smartContract';
+import { useEffect, useState } from 'react';
+import ProgressBar from './ProgressBar';
 
 type Inputs = {
   originAccount: string;
-  destinationAccount: string;
+  smartContractAddress: string;
   amount: string;
 };
 
-export default function TransactionForm({
-  sendTransaction,
-  accounts,
-  userAccounts,
-}: {
-  sendTransaction(
-    transactionConfig: TransactionConfig
-  ): PromiEvent<TransactionReceipt>;
-  accounts: IAccount[];
-  userAccounts: IAccount[];
-}) {
-  const { register, handleSubmit, watch } = useForm<Inputs>();
+
+export default function TransactionForm({metaMaskAccount}: {metaMaskAccount: IAccount}) {
+  useEffect(() => {
+    setStateBalance();
+  }, []);
+
+  const [balance, setBalance] = useState(0);
+
+  async function setStateBalance(): Promise<void> {
+    const balance = await smartContract.methods.getBalance().call();
+    setBalance(balance);
+  }
+
+  const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const receipt = await sendTransaction({
-        from: data.originAccount,
-        to: data.destinationAccount,
-        value: ethToWei(data.amount),
-        // gas?: number | string;
-        // gasPrice?: number | string | BN;
-        // data?: string;
-        // nonce?: number;
-        // chainId?: number;
-        // common?: Common;
-        // chain?: string;
-        // hardfork?: string;
+      await smartContract.methods.receiveMoney().send({ from: metaMaskAccount.address, value: ethToWei(data.amount) })
+      .then(function (receipt: any) {
+        console.log(receipt)
       });
+      setStateBalance();
+      reset({amount: ""});
     } catch (error) {
       alert(error);
     }
@@ -43,40 +40,20 @@ export default function TransactionForm({
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-    <form onSubmit={handleSubmit(onSubmit)} key='origin'>
-      <select {...register('originAccount')}>
-        <option value=''></option>
-        {userAccounts
-          .filter((account) => account.address)
-          .map((account) => {
-            return (
-              <option key={account.address} value={account.address}>{`${
-                account.address
-              } (${weiToEth(account.balance)} ETH)`}</option>
-            );
-          })}
-      </select>
-      <br />
-      <select {...register('destinationAccount')} key='destination'>
-        <option value=''></option>
-        {accounts
-          .filter((account) => account.address !== watch('originAccount'))
-          .map((account) => {
-            return (
-              <option key={account.address} value={account.address}>{`${
-                account.address
-              } (${weiToEth(account.balance)} ETH)`}</option>
-            );
-          })}
-      </select>
-      <br />
-      <input
-        {...register('amount')}
-        placeholder='Amount'
-        autoComplete='false'
-        key='amount'
-      />
-      <input type='submit' />
-    </form>
+    <>
+      <h1>Crowdfunding project</h1>
+      <ProgressBar balance={weiToEth(balance.toString())} goal={100}></ProgressBar>
+      {/* <div>{`${metaMaskAccount?.address} (${weiToEth(metaMaskAccount?.balance)} ETH)`}</div> */}
+      <form onSubmit={handleSubmit(onSubmit)} key='origin'>
+        <br />
+        <input
+          {...register('amount')}
+          placeholder='Amount (ETH)'
+          autoComplete='false'
+          key='amount'
+        />
+        <button type="submit">Donate</button>
+      </form>
+    </>
   );
 }
