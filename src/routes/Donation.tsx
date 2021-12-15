@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { IAccount } from '../components/shared/IAccount';
-import TransactionForm from '../components/forms/TransactionForm';
+import TransactionForm from '../components/forms/DonationForm';
 import ProgressBar from '../components/ProgressBar';
 import { weiToEth } from '../utils/exchanges';
 import { smartContract } from '../smartContract';

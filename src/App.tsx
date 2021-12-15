@@ -6,7 +6,8 @@ import Header from './components/shared/Header';
 import { IAccount } from './components/shared/IAccount';
 import { fetchAccounts } from './utils/fetchAccounts';
 import ContractsList from './routes/ContractsList';
-import MakeDonation from './routes/MakeDonation';
+import Donation from './routes/Donation';
+import Project from './routes/Project';
 
 declare global {
   interface Window {
@@ -34,7 +35,8 @@ export default function App() {
         <Header />
         <Routes>
           <Route path="/" element={<ContractsList />} />
-          <Route path="/:id/donate" element={<MakeDonation userAccount={metaMaskAccounts[0]}/>} />
+          <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]}/>} />
+          <Route path="/:id/donate" element={<Donation userAccount={metaMaskAccounts[0]}/>} />
         </Routes>
       </BrowserRouter>
     </>
