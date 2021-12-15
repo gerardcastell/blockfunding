@@ -10,25 +10,29 @@ contract CrowdFunding {
     mapping(address => uint256) public balanceReceived;
     mapping(address => mapping(uint256 => bool)) public isDonationClaimed; // Amount of ETH each org can claim per claimable event
 
-    constructor(uint16 _days, uint256 _ethGoal) {
-        // msg.sender is the address of the person who deployed the SC
+    constructor(uint256 _days, uint256 _ethGoal) {
         owner = msg.sender;
-        // deadline = block.timestamp + _days * 24 * 3600; // TODO why is not working?
-        deadline = 100000000000000000000;
-
-        // Save the amount of ETH the person wants to raise in ether
-        ethGoal = _ethGoal * 1000000000000000000;
+        deadline = block.timestamp + _days * 24 * 3600;
+        ethGoal = _ethGoal * 1000000000000000000; // convert to wei
     }
 
-    // modifier to check if the owner still accepts donations
     modifier inTime() {
         require(block.timestamp <= deadline, "Donations are closed");
         _;
     }
 
-    // modifier to check if caller is owner
+    modifier notInTime() {
+        require(block.timestamp > deadline, "Donations are still ongoing");
+        _;
+    }
+
     modifier isOwner() {
-        require(msg.sender == owner, "Caller is not owner");
+        require(msg.sender == owner, "Caller is not the founder");
+        _;
+    }
+
+    modifier isNotOwner() {
+        require(msg.sender != owner, "Caller is the founder");
         _;
     }
 
@@ -37,34 +41,40 @@ contract CrowdFunding {
         _;
     }
 
-    // function makeDonation() public payable inTime {
-    function makeDonation() public payable {
-        require(balance <= ethGoal, "Goal is achieved");
+    modifier isNotAchieved() {
+        require(balance < ethGoal, "Goal is achieved");
+        _;
+    }
 
+    function makeDonation() public payable isNotOwner inTime isNotAchieved {
         assert(msg.value == uint64(msg.value));
 
         // User sends donation to the contract
         balanceReceived[msg.sender] += msg.value;
+        isDonationClaimed[msg.sender][msg.value] == false;
         balance += msg.value;
 
         assert(balanceReceived[msg.sender] >= uint64(msg.value));
     }
 
-    // TODO not working, everyone can claim
-    function claim(uint256 _amount) public {
+    function claim(uint256 _amount) public notInTime {
         // Check if the user has already claimed his funds
         require(
             isDonationClaimed[msg.sender][_amount] == false,
             "Donation already claimed"
         );
 
-        // TODO If the donator makes more donations??
-        // --> We could update the mapping with the new amount + the previous
+        _amount = _amount * 1000000000000000000; // Convert to wei
+        require(balanceReceived[msg.sender] - _amount >= 0, "Not enough funds");
 
-        // TODO If the donator selects a lower amount than the one he has donated?
+        // if (balanceReceived[msg.sender] - _amount >= 0) {
+        balanceReceived[msg.sender] -= _amount;
 
-        // Mark that that user with this amount has already claimed funds
-        isDonationClaimed[msg.sender][_amount] = true;
+        if (balanceReceived[msg.sender] == 0) {
+            // Mark that that user with this amount has already claimed funds
+            isDonationClaimed[msg.sender][_amount] = true;
+        }
+
         balance -= _amount;
 
         // Send funds to the donator
