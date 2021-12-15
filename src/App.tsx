@@ -8,6 +8,7 @@ import { fetchAccounts } from './utils/fetchAccounts';
 import ContractsList from './routes/ContractsList';
 import Donation from './routes/Donation';
 import Project from './routes/Project';
+import { Container } from '@mui/material';
 
 declare global {
   interface Window {
@@ -33,11 +34,13 @@ export default function App() {
     <>
       <BrowserRouter>
         <Header />
-        <Routes>
-          <Route path="/" element={<ContractsList />} />
-          <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]}/>} />
-          <Route path="/:id/donate" element={<Donation userAccount={metaMaskAccounts[0]}/>} />
-        </Routes>
+        <Container maxWidth="md">
+          <Routes>
+            <Route path="/" element={<ContractsList />} />
+            <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]} />} />
+            <Route path="/:id/donate" element={<Donation userAccount={metaMaskAccounts[0]} />} />
+          </Routes>
+        </Container>
       </BrowserRouter>
     </>
   );

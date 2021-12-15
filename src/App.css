@@ -22,6 +22,8 @@ input {
   padding: 10px 15px;
   margin-bottom: 15px;
   font-size: 20px;
+  border-color: #b3b3b3;
+	border-style: solid;
 }
 
 button[type="submit"],
