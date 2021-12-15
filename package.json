@@ -33,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "compile:contract": "solcjs --bin --abi -o ./solc ./smart-contract/SimplePayment.sol",
+    "compile:contract": "solcjs --bin --abi -o ./solc ./smart_contract/contract.sol",
     "deploy:contract": "node ./deployContract.js",
     "blockchain-up": "ganache-cli -b feature 20 -m 'test test test test test test test test junk'",
     "run:all": "BROWSER=firefox concurrently 'npm run compile:contract && npm run blockchain-up' 'wait-on tcp:127.0.0.1:8545 && npm run deploy:contract' 'npm run start'"
