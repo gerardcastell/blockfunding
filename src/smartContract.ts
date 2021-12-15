@@ -1,8 +1,8 @@
 import Web3 from 'web3';
-import {AbiItem} from 'web3-utils';
+import { AbiItem } from 'web3-utils';
 
-const web3 = new Web3("http://localhost:8545");
-const abi : AbiItem[] = [ 
+const web3 = new Web3('http://localhost:8545');
+const abi: AbiItem[] = [
   {
     inputs: [],
     name: 'balanceReceived',
@@ -43,4 +43,3 @@ const abi : AbiItem[] = [
 const address = '0x253839C34a88d160390F8B8054A0f99acC362865';
 
 export const smartContract = new web3.eth.Contract(abi, address);
-
