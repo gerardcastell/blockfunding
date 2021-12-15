@@ -4,6 +4,7 @@ import './App.css';
 import Header from './components/Header';
 import { IAccount } from './components/IAccount';
 import TransactionForm from './components/TransactionForm';
+
 declare global {
   interface Window {
     web3: Web3;
@@ -40,10 +41,8 @@ function App() {
 
   return (
     <div className='App'>
-      <header className='App-header'>
-        <Header />
-        <TransactionForm metaMaskAccount={userAccounts[0]} />
-      </header>
+      <Header />
+      <TransactionForm metaMaskAccount={userAccounts[0]} />
     </div>
   );
 }
