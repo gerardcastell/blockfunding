@@ -104,8 +104,8 @@ contract CrowdFunding {
         // Send funds to the donator address
         payable(msg.sender).transfer(_amount);
     }
-
+   
     function withdrawFunds(address payable _to) public isOwner(msg.sender) isAchieved(msg.sender) {
-        _to.transfer(address(this).balance);
+        payable(msg.sender).transfer(address(this).balance);       
     }
 }
