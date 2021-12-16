@@ -4,8 +4,8 @@ import * as fs from 'fs';
 function run() {
   const ganacheWeb3 = new Web3('http://localhost:8545');
   const contractPath =
-    './solc/smart-contract_SimplePayment_sol_SimplePayment.bin';
-  const abiPath = './solc/smart-contract_SimplePayment_sol_SimplePayment.abi';
+    './solc/smart-contract_CrowdFunding_sol_CrowdFunding.bin';
+  const abiPath = './solc/smart-contract_CrowdFunding_sol_CrowdFunding.abi';
   const data = fs.readFileSync(contractPath).toString();
 
   try {
@@ -27,7 +27,10 @@ function run() {
 
 function deployContract(contract, data) {
   contract
-    .deploy({ data })
+    .deploy({ 
+      data,
+      arguments: [30, 10]
+    })
     .send({
       from: '0xe553eE64bbFF7B2D3012efB884e0887Aa364691C',
       gas: 1500000,
