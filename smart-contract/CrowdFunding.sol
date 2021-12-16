@@ -1,97 +1,111 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.10;
+pragma solidity >=0.7.0 <0.9.0;
+
+
+pragma solidity >=0.8.7 <0.9.0;
 
 contract CrowdFunding {
-    // Leader of the crowdfunding campaign
-    address public owner;
-
-    // The amount of wei raised so far
-    uint256 public balance;
-
-    // Amount of founds the project founder wants to collect
-    uint256 public ethGoal;
-
-    // Deadline in seconds (unix timestamp)
-    uint256 public deadline;
-
-    // Amount that every user has contributed
-    mapping(address => uint256) public balanceReceived;
-
-    // Amount of ETH each org can claim per claimable event
-    mapping(address => mapping(uint256 => bool)) public isDonationClaimed;
-
-    constructor(uint256 _days, uint256 _ethGoal) {
-        owner = msg.sender;
-        deadline = block.timestamp + _days * 24 * 3600;
-        ethGoal = _ethGoal * 1000000000000000000; // convert to wei
+    struct Project {
+        // Leader of the crowdfunding campaign
+        address owner;
+        // The amount of wei raised so far
+        uint256 balance;
+        // Amount of founds the project founder wants to collect
+        uint256 ethGoal;
+        // Deadline in seconds (unix timestamp)
+        uint256 deadline;
+        // Amount that every user has contributed
+        mapping(address => uint256) balanceReceived;
+        // Amount of ETH each org can claim per claimable event
+        mapping(address => mapping(uint256 => bool)) isDonationClaimed;
     }
 
-    modifier inTime() {
-        require(block.timestamp <= deadline, "Donations are closed");
+    // Mapping of crowdfunding address to the its Project struct
+    mapping(address => Project) projects;
+    // List of crowdfunding projects
+    Project[] crowdfundingList;
+
+    modifier inTime(address _crowdFundingAddress) {
+        require(block.timestamp <= projects[_crowdFundingAddress].deadline, "Donations are closed");
         _;
     }
 
-    modifier notInTime() {
-        require(block.timestamp > deadline, "Donations are still ongoing");
+    modifier notInTime(address _crowdFundingAddress) {
+        require(block.timestamp > projects[_crowdFundingAddress].deadline, "Donations are still ongoing");
         _;
     }
 
-    modifier isOwner() {
-        require(msg.sender == owner, "Caller is not the founder");
+    modifier isOwner(address _ownerAddr) {
+        require(msg.sender == projects[_ownerAddr].owner, "Caller is not the founder");
         _;
     }
 
-    modifier isNotOwner() {
-        require(msg.sender != owner, "Caller is the founder");
+    modifier isNotOwner(address _ownerAddr) {
+        require(msg.sender != projects[_ownerAddr].owner, "Caller is the founder");
         _;
     }
 
-    modifier isAchieved() {
-        require(balance >= ethGoal, "Goal is not achieved");
+    modifier isAchieved(address _crowdFundingAddress) {
+        require(projects[_crowdFundingAddress].balance >= projects[_crowdFundingAddress].ethGoal, "Goal is not achieved");
         _;
     }
 
-    modifier isNotAchieved() {
-        require(balance < ethGoal, "Goal is achieved");
+    modifier isNotAchieved(address _crowdFundingAddress) {
+        require(projects[_crowdFundingAddress].balance < projects[_crowdFundingAddress].ethGoal, "Goal is achieved");
         _;
     }
 
-    function makeDonation() public payable isNotOwner inTime isNotAchieved {
-        assert(msg.value == uint64(msg.value));
+    function createNewProject(uint256 _days, uint256 _ethGoal) public {
+        projects[msg.sender].owner = msg.sender;
+        projects[msg.sender].balance = 0;
+        projects[msg.sender].ethGoal =  _ethGoal * 1000000000000000000;
+        projects[msg.sender].deadline =  block.timestamp + _days * 24 * 3600;
 
-        // User sends donation to the contract
-        balanceReceived[msg.sender] += msg.value;
-        isDonationClaimed[msg.sender][msg.value] == false;
-        balance += msg.value;
+        // Project storage project = projects[msg.sender];
+        // crowdfundingList.push(project);
+        assert(projects[msg.sender].owner == msg.sender);
+        assert(projects[msg.sender].balance == 0);
+        assert(projects[msg.sender].ethGoal ==  _ethGoal * 1000000000000000000);
+        assert(projects[msg.sender].deadline ==  block.timestamp + _days * 24 * 3600);
 
-        assert(balanceReceived[msg.sender] >= uint64(msg.value));
     }
 
-    function claim(uint256 _amount) public notInTime isNotAchieved {
+    function makeDonation(address _crowdFundingAddress) public payable isNotOwner(msg.sender) inTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+
+        projects[_crowdFundingAddress].balanceReceived[msg.sender] += msg.value;
+        projects[_crowdFundingAddress].isDonationClaimed[msg.sender][msg.value] == false;
+        projects[_crowdFundingAddress].balance += msg.value;
+        //assert(projects[_crowdFundingAddress].balanceReceived[_crowdFundingAddress] >= uint64(msg.value));
+    }
+
+    function claim(address _crowdFundingAddress, uint256 _amount) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
         // Check if the user has already claimed his funds
         require(
-            isDonationClaimed[msg.sender][_amount] == false,
+            projects[_crowdFundingAddress].isDonationClaimed[msg.sender][_amount] == false,
             "Donation already claimed"
         );
 
         _amount = _amount * 1000000000000000000; // Convert to wei
-        require(balanceReceived[msg.sender] - _amount >= 0, "Not enough funds");
+        require(
+            projects[_crowdFundingAddress].balanceReceived[msg.sender] - _amount >= 0,
+            "Not enough funds"
+        );
 
-        balanceReceived[msg.sender] -= _amount;
+        projects[_crowdFundingAddress].balanceReceived[msg.sender] -= _amount;
 
-        if (balanceReceived[msg.sender] == 0) {
+        if (projects[_crowdFundingAddress].balanceReceived[msg.sender] == 0) {
             // Mark that that user with this amount has already claimed funds
-            isDonationClaimed[msg.sender][_amount] = true;
+            projects[_crowdFundingAddress].isDonationClaimed[msg.sender][_amount] = true;
         }
 
-        balance -= _amount;
+        projects[_crowdFundingAddress].balance -= _amount;
 
         // Send funds to the donator address
         payable(msg.sender).transfer(_amount);
     }
 
-    function withdrawFunds(address payable _to) public isOwner isAchieved {
+    function withdrawFunds(address payable _to) public isOwner(msg.sender) isAchieved(msg.sender) {
         _to.transfer(address(this).balance);
     }
 }
