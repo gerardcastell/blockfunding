@@ -62,7 +62,6 @@ contract CrowdFunding {
         projects[msg.sender].ethGoal =  _ethGoal * 1000000000000000000;
         projects[msg.sender].deadline =  block.timestamp + _days * 24 * 3600;
 
-        // Project storage project = projects[msg.sender];
         // crowdfundingList.push(project);
         assert(projects[msg.sender].owner == msg.sender);
         assert(projects[msg.sender].balance == 0);
