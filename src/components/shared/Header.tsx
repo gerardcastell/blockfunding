@@ -13,8 +13,14 @@ import InsertEmoticonSharpIcon from '@mui/icons-material/InsertEmoticonSharp';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
+import { Link } from 'react-router-dom';
 export default function Header() {
-  const pages = ['List', 'Create a Crowdfunding', 'About us'];
+
+  const pages : {title: string, route: string;}[] = [
+    {title: 'List', route: "/"}, 
+    {title: 'Create a Crowdfunding', route: "/create"}, 
+    {title: 'About us', route: '/about'}
+  ];
   const [auth, setAuth] = React.useState(true);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -83,8 +89,8 @@ export default function Header() {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign='center'>{page}</Typography>
+                  <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                    <Typography textAlign='center'>{page.title}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
@@ -100,11 +106,12 @@ export default function Header() {
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                 <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
+                  key={page.title}
+                  component={Link}
+                  to={page.route}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
-                  {page}
+                  {page.title}
                 </Button>
               ))}
             </Box>

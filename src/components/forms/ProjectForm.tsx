@@ -14,11 +14,8 @@ export default function ProjectForm({ userAccount }: { userAccount: IAccount }) 
   const { register, handleSubmit } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const millisDeadline = new Date(data.deadline);
-      millisDeadline.setHours(0, 0, 0, 0);
-      const daysDeadline = Math.floor(millisDeadline.getTime() / (MILLIS_X_DAYS));
-      console.log(daysDeadline);
-      // await smartContract.methods.createNewProject().send({ from: userAccount.address, value: data.goalAmount })
+      const millisDeadline = new Date(data.deadline).getTime();
+      await smartContract.methods.createNewProject(millisDeadline / 1000, data.goalAmount).send({ from: userAccount.address });
     } catch (error) {
       alert(error);
     }
@@ -31,17 +28,18 @@ export default function ProjectForm({ userAccount }: { userAccount: IAccount }) 
       <input
         {...register('goalAmount')}
         placeholder='Goal amount (ETH)'
-        autoComplete='false'
+        autoComplete='off'
         key='goalAmount'
         required
+        type="number"
       />
       <input
         {...register('deadline')}
         placeholder='Project deadline'
-        autoComplete='false'
+        autoComplete='off'
         key='deadline'
-        type='date'
         required
+        type='date'
       />
       <button type="submit">Create</button>
     </form>

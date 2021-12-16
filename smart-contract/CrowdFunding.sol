@@ -22,7 +22,7 @@ contract CrowdFunding {
     }
 
     // Mapping of crowdfunding address to the its Project struct
-    mapping(address => Project) projects;
+    mapping(address => Project) public projects;
     // List of crowdfunding projects
     Project[] crowdfundingList;
 

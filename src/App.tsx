@@ -5,7 +5,7 @@ import './App.css';
 import Header from './components/shared/Header';
 import { IAccount } from './components/shared/IAccount';
 import { fetchAccounts } from './utils/fetchAccounts';
-import ContractsList from './routes/ContractsList';
+import ProjectsList from './routes/ProjectsList';
 import Donation from './routes/Donation';
 import Project from './routes/Project';
 import { Container } from '@mui/material';
@@ -36,7 +36,7 @@ export default function App() {
         <Header />
         <Container maxWidth="md">
           <Routes>
-            <Route path="/" element={<ContractsList />} />
+            <Route path="/" element={<ProjectsList />} />
             <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]} />} />
             <Route path="/:id/donate" element={<Donation userAccount={metaMaskAccounts[0]} />} />
           </Routes>
