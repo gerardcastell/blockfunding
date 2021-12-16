@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
-
 
 pragma solidity >=0.8.7 <0.9.0;
 
@@ -24,7 +22,7 @@ contract CrowdFunding {
     // Mapping of crowdfunding address to the its Project struct
     mapping(address => Project) public projects;
     // List of crowdfunding projects
-    address[] crowdfundingList;
+    address[] public crowdfundingList;
 
     modifier inTime(address _crowdFundingAddress) {
         require(block.timestamp <= projects[_crowdFundingAddress].deadline, "Donations are closed");
