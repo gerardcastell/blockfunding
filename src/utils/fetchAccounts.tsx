@@ -15,3 +15,10 @@ export async function fetchAccounts(
         setter((accounts) => [...accounts, { address: accountNumber, balance }]);
     }
 }
+
+export function changeState(
+    setState: React.Dispatch<React.SetStateAction<any>>,
+    field: string,
+    newValue: any): void {
+    setState((prevState: any) => ({ ...prevState, [field]: newValue }));
+}

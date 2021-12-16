@@ -1,23 +1,21 @@
 import { Line } from 'rc-progress';
 import { useEffect, useState } from 'react';
+import { IProjectInfo } from './types/project';
 
-export default function ProgressBar({ balance, goal }: { balance: number, goal: number }) {
+export default function ProgressBar({ projectInfo }: { projectInfo: IProjectInfo }) {
 
-    const containerStyle = {
-        width: '55rem',
-    }; //TODO: Move to css
-
-    const [percent, setPercent] = useState<number>(balance);
+    const [percent, setPercent] = useState<number>(projectInfo.progress);
+    const [balance, setBalance] = useState<number>(projectInfo.ethGoal);
 
     useEffect(() => {
-        setPercent((balance / goal));
-        // setColor(colorMap[parseInt((percent*100).toString())]);
-    }, [balance])
+        setPercent(projectInfo.progress);
+        setBalance(projectInfo.balance);
+    }, [projectInfo])
 
     return (
         <>
-            <Line style={containerStyle} percent={percent * 100} strokeWidth={1} strokeColor={"#ec5990"}></Line>
-            <div>{`${balance} of ${goal} ETH funded`}</div>
+            <Line percent={percent * 100} strokeWidth={1} strokeColor={"#ec5990"}></Line>
+            <div>{`${balance} of ${projectInfo.ethGoal} ETH funded`}</div>
         </>
     )
 };

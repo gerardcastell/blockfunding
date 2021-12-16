@@ -4,25 +4,39 @@ import TransactionForm from '../components/forms/DonationForm';
 import ProgressBar from '../components/ProgressBar';
 import { weiToEth } from '../utils/exchanges';
 import { smartContract } from '../smartContract';
+import { IProjectInfo } from '../components/types/project';
+import { changeState } from '../utils/fetchAccounts';
 
 export default function MakeDonation({ userAccount }: { userAccount: IAccount }) {
 
-  const [balance, setBalance] = useState(0);
-
   useEffect(() => {
-    setStateBalance();
+    console.log("loquesea");
+    setProjectInfo();
   }, [])
 
-  const setStateBalance = async () => {
-    const balance = await smartContract.methods.getBalance().call();
-    setBalance(balance);
+  const [state, setState] = useState<IProjectInfo>({
+    projectId: "",
+    balance: 0,
+    ethGoal: 0,
+    deadline: 0,
+    progress: 0
+  });
+
+  const setProjectInfo = async () => {
+    const balance = await smartContract.methods.balance().call();
+    const ethGoal = await smartContract.methods.ethGoal().call();
+    const deadline = await smartContract.methods.deadline().call();
+    changeState(setState, "ethGoal", weiToEth(ethGoal) as number);
+    changeState(setState, "balance", weiToEth(balance) as number);
+    changeState(setState, "deadline", deadline);
+    changeState(setState, "progress", state.balance / ethGoal);
   };
 
   return (
     <>
       <h1>PROJECT TITLE</h1>
-      <ProgressBar balance={weiToEth(balance.toString())} goal={100}></ProgressBar>
-      <TransactionForm userAccount={userAccount} balanceSetter={setStateBalance} />
+      <ProgressBar projectInfo={state}></ProgressBar>
+      <TransactionForm userAccount={userAccount} stateSetter={setState} />
     </>
   );
 }

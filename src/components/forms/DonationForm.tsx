@@ -2,8 +2,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { ethToWei, weiToEth } from '../../utils/exchanges';
 import { IAccount } from '../shared/IAccount';
 import { smartContract } from '../../smartContract';
-import { useEffect, useState } from 'react';
-import ProgressBar from '../ProgressBar';
+import { changeState } from '../../utils/fetchAccounts';
 
 type Inputs = {
   originAccount: string;
@@ -11,18 +10,21 @@ type Inputs = {
   amount: string;
 };
 
-
-export default function TransactionForm({userAccount, balanceSetter}: {userAccount: IAccount, balanceSetter: () => Promise<void>}) {
+export default function TransactionForm({ userAccount, stateSetter }: {
+  userAccount: IAccount,
+  stateSetter: React.Dispatch<React.SetStateAction<any>>
+}) {
 
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       await smartContract.methods.receiveMoney().send({ from: userAccount.address, value: ethToWei(data.amount) })
-      .then(function (receipt: any) {
-        console.log(receipt)
-      });
-      balanceSetter();
-      reset({amount: ""});
+        .then(function (receipt: any) {
+          console.log(receipt)
+        });
+        const balance = await smartContract.methods.getBalance().call();
+        changeState(stateSetter, "balance", balance)
+      reset({ amount: "" });
     } catch (error) {
       alert(error);
     }
@@ -30,15 +32,15 @@ export default function TransactionForm({userAccount, balanceSetter}: {userAccou
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-      <form onSubmit={handleSubmit(onSubmit)} key='origin'>
-        <br />
-        <input
-          {...register('amount')}
-          placeholder='Amount (ETH)'
-          autoComplete='false'
-          key='amount'
-        />
-        <button type="submit">Donate</button>
-      </form>
+    <form onSubmit={handleSubmit(onSubmit)} key='origin'>
+      <br />
+      <input
+        {...register('amount')}
+        placeholder='Amount (ETH)'
+        autoComplete='false'
+        key='amount'
+      />
+      <button type="submit">Donate</button>
+    </form>
   );
 }
