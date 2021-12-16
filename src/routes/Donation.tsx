@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { IAccount } from '../components/shared/IAccount';
-import TransactionForm from '../components/forms/DonationForm';
+import DonationForm from '../components/forms/DonationForm';
 import ProgressBar from '../components/ProgressBar';
-import { weiToEth } from '../utils/exchanges';
+import { secondsToMillis, weiToEth } from '../utils/exchanges';
 import { smartContract } from '../smartContract';
 import { IProjectInfo } from '../components/types/project';
 import { changeState } from '../utils/fetchAccounts';
+import WithdrawButton from '../components/forms/WithdrawButton';
 
-export default function MakeDonation({ userAccount }: { userAccount: IAccount }) {
+export default function Donation({ userAccount }: { userAccount: IAccount }) {
 
   useEffect(() => {
-    console.log("loquesea");
     setProjectInfo();
   }, [])
 
@@ -26,17 +26,20 @@ export default function MakeDonation({ userAccount }: { userAccount: IAccount })
     const balance = await smartContract.methods.balance().call();
     const ethGoal = await smartContract.methods.ethGoal().call();
     const deadline = await smartContract.methods.deadline().call();
-    changeState(setState, "ethGoal", weiToEth(ethGoal) as number);
-    changeState(setState, "balance", weiToEth(balance) as number);
-    changeState(setState, "deadline", deadline);
-    changeState(setState, "progress", state.balance / ethGoal);
+    const progress = balance / ethGoal * 100;
+    changeState(setState, "ethGoal", parseFloat(weiToEth(ethGoal) as string));
+    changeState(setState, "balance", parseFloat(weiToEth(balance) as string));
+    changeState(setState, "deadline", parseInt(deadline));
+    changeState(setState, "progress", progress);
   };
 
   return (
     <>
       <h1>PROJECT TITLE</h1>
+      <h3>{`Closes on ${new Date(secondsToMillis(state.deadline))}`}</h3>
       <ProgressBar projectInfo={state}></ProgressBar>
-      <TransactionForm userAccount={userAccount} stateSetter={setState} />
+      <DonationForm userAccount={userAccount} ethGoal={state.ethGoal} stateSetter={setState} />
+      <WithdrawButton userAccount={userAccount}/>
     </>
   );
 }

@@ -10,23 +10,24 @@ type Inputs = {
   amount: string;
 };
 
-export default function TransactionForm({ userAccount, stateSetter }: {
+export default function DonationForm({ userAccount, stateSetter, ethGoal }: {
   userAccount: IAccount,
+  ethGoal: number,
   stateSetter: React.Dispatch<React.SetStateAction<any>>
 }) {
 
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await smartContract.methods.receiveMoney().send({ from: userAccount.address, value: ethToWei(data.amount) })
-        .then(function (receipt: any) {
-          console.log(receipt)
-        });
-        const balance = await smartContract.methods.getBalance().call();
-        changeState(stateSetter, "balance", balance)
-      reset({ amount: "" });
+      await smartContract.methods.makeDonation().send({ from: userAccount.address, value: ethToWei(data.amount) })
+      alert("Donation processed!")
+      const balance = await smartContract.methods.balance().call();
+      changeState(stateSetter, "balance", weiToEth(balance));
+      changeState(stateSetter, "progress", weiToEth(balance) as number / ethGoal);
     } catch (error) {
       alert(error);
+    } finally {
+      reset({ amount: "" });
     }
   };
 
@@ -37,7 +38,7 @@ export default function TransactionForm({ userAccount, stateSetter }: {
       <input
         {...register('amount')}
         placeholder='Amount (ETH)'
-        autoComplete='false'
+        autoComplete='off'
         key='amount'
       />
       <button type="submit">Donate</button>

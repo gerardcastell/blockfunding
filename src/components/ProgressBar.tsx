@@ -4,17 +4,18 @@ import { IProjectInfo } from './types/project';
 
 export default function ProgressBar({ projectInfo }: { projectInfo: IProjectInfo }) {
 
-    const [percent, setPercent] = useState<number>(projectInfo.progress);
+    const [progress, setPercent] = useState<number>(projectInfo.progress);
     const [balance, setBalance] = useState<number>(projectInfo.ethGoal);
+    // const [deadline, setDeadline] = useState<number>(projectInfo.deadline);
 
     useEffect(() => {
         setPercent(projectInfo.progress);
         setBalance(projectInfo.balance);
-    }, [projectInfo])
+    }, [projectInfo]);
 
     return (
         <>
-            <Line percent={percent * 100} strokeWidth={1} strokeColor={"#ec5990"}></Line>
+            <Line percent={progress} strokeWidth={1} strokeColor={"#ec5990"}></Line>
             <div>{`${balance} of ${projectInfo.ethGoal} ETH funded`}</div>
         </>
     )
