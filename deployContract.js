@@ -17,23 +17,29 @@ function run() {
     );
     deployContract(contract, data);
   } catch (error) {
-    throw console.error(`There was a problem deploying the smart contract: ${JSON.stringify(error)}`);
+    throw new Error(
+      `There was a problem deploying the smart contract: ${JSON.stringify(
+        error
+      )}`
+    );
   }
 }
 
 function deployContract(contract, data) {
   contract
-    .deploy({data})
+    .deploy({ data })
     .send({
       from: '0xe553eE64bbFF7B2D3012efB884e0887Aa364691C',
       gas: 1500000,
       gasPrice: '30000000000000',
     })
-    .then(function (newContractInstance) {
-      console.log(`Contract deployed with address: ${newContractInstance.options.address}`); // instance with the new contract address
-    })
-    .catch(function (error) {
+    .on('error', function (error) {
       throw new Error(error);
+    })
+    .then(function (newContractInstance) {
+      console.log(
+        `Contract deployed with address: ${newContractInstance.options.address}`
+      ); // instance with the new contract address
     });
 }
 
