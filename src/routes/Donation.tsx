@@ -7,28 +7,25 @@ import WithdrawButton from '../components/forms/WithdrawButton';
 import { useParams } from 'react-router-dom';
 
 export default function Donation({ userAccount }: { userAccount: string }) {
-  
+  const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
   const { ethereum } = window;
-  
+
   useEffect(() => {
     setProjectInfo();
-    ethereum.on("accountsChanged", function (accounts: any) {
+    ethereum.on('accountsChanged', function (accounts: any) {
       setCurrentAccount(accounts[0]);
-    })
+    });
   }, []);
-
-  const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
-
 
   const { id } = useParams();
 
   const [state, setState] = useState<any>({
-    projectId: "",
-    title: "",
+    projectId: '',
+    title: '',
     balance: 0,
     ethGoal: 0,
     deadline: 0,
-    progress: 0
+    progress: 0,
   });
 
   const setProjectInfo = async () => {
@@ -41,7 +38,11 @@ export default function Donation({ userAccount }: { userAccount: string }) {
       <h1>{state.title}</h1>
       <h3>{`Closes on ${new Date(secondsToMillis(state.deadline))}`}</h3>
       <ProgressBar projectInfo={state}></ProgressBar>
-      <DonationForm incomingAccount={userAccount} projectId={state.owner} stateSetter={setState} />
+      <DonationForm
+        incomingAccount={userAccount}
+        projectId={state.owner}
+        stateSetter={setState}
+      />
       <WithdrawButton userAccount={currentAccount} />
     </>
   );

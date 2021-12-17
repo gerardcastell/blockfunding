@@ -10,33 +10,39 @@ type Inputs = {
   amount: string;
 };
 
-export default function DonationForm({ incomingAccount, projectId, stateSetter }: {
-  incomingAccount: string,
-  projectId: string,
-  stateSetter: React.Dispatch<React.SetStateAction<any>>
+export default function DonationForm({
+  incomingAccount,
+  projectId,
+  stateSetter,
+}: {
+  incomingAccount: string;
+  projectId: string;
+  stateSetter: React.Dispatch<React.SetStateAction<any>>;
 }) {
-
   const { ethereum } = window;
-  
-  useEffect(() => {
-    ethereum.on("accountsChanged", function (accounts: any) {
-      setCurrentAccount(accounts[0]);
-    })
-  }, [])
-
   const [currentAccount, setCurrentAccount] = useState<string>(incomingAccount);
-
   const { register, handleSubmit, reset } = useForm<Inputs>();
+
+  useEffect(() => {
+    ethereum.on('accountsChanged', function (accounts: any) {
+      setCurrentAccount(accounts[0]);
+    });
+  }, []);
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await smartContract.methods.makeDonation(projectId).send({ from: currentAccount, value: ethToWei(data.amount) })
-      alert("Donation processed!")
-      const projectInfo = await smartContract.methods.getProject(projectId).call();
+      await smartContract.methods
+        .makeDonation(projectId)
+        .send({ from: currentAccount, value: ethToWei(data.amount) });
+      alert('Donation processed!');
+      const projectInfo = await smartContract.methods
+        .getProject(projectId)
+        .call();
       stateSetter(projectInfo);
     } catch (error) {
       alert(error);
     } finally {
-      reset({ amount: "" });
+      reset({ amount: '' });
     }
   };
 
@@ -50,7 +56,7 @@ export default function DonationForm({ incomingAccount, projectId, stateSetter }
         autoComplete='off'
         key='amount'
       />
-      <button type="submit">Donate</button>
+      <button type='submit'>Donate</button>
     </form>
   );
 }
