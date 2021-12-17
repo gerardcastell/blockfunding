@@ -10,7 +10,6 @@ export async function fetchAccounts(
     });
     setter(() => []); // TODO: REMOVE THIS (used to not accumulate accounts when developing)
     for (const accountNumber of accountNumbers) {
-        const balance = await web3.eth.getBalance(accountNumber);
         setter((accounts) => [...accounts, accountNumber]);
     }
 }
