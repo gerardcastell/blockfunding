@@ -19,7 +19,7 @@ export default function BasicTable({
       <Table sx={{ minWidth: 650 }} aria-label='simple table'>
         <TableHead>
           <TableRow>
-            <TableCell align="center">Id</TableCell>
+            <TableCell align="center">Owner</TableCell>
             <TableCell align="center">Title</TableCell>
             <TableCell align="center">Goal (Ethers)</TableCell>
             <TableCell align="center">Progress</TableCell>
