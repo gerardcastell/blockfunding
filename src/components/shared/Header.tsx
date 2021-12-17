@@ -52,106 +52,84 @@ export default function Header() {
     setAnchorElUser(null);
   };
   return (
-    <>
-      <AppBar position='static'>
-        <Container maxWidth='xl'>
-          <Toolbar disableGutters>
-            <Typography
-              variant='h6'
-              noWrap
-              component='div'
-              sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-            >
-              BLOCKFUNDING
-            </Typography>
+    <AppBar position='static'>
+      <Container maxWidth='xl'>
+        <Toolbar disableGutters>
+          <Typography
+            variant='h6'
+            noWrap
+            component='div'
+            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+          >
+            BLOCKFUNDING
+          </Typography>
 
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size='large'
-                aria-label='account of current user'
-                aria-controls='menu-appbar'
-                aria-haspopup='true'
-                onClick={handleOpenNavMenu}
-                color='inherit'
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id='menu-appbar'
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: 'block', md: 'none' },
-                }}
-              >
-                {pages.map((page) => (
-                  <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-                    <Typography textAlign='center'>{page.title}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            <Typography
-              variant='h6'
-              noWrap
-              component='div'
-              sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size='large'
+              aria-label='account of current user'
+              aria-controls='menu-appbar'
+              aria-haspopup='true'
+              onClick={handleOpenNavMenu}
+              color='inherit'
             >
-              LOGO
-            </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id='menu-appbar'
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              sx={{
+                display: { xs: 'block', md: 'none' },
+              }}
+            >
               {pages.map((page) => (
-                <Button
-                  key={page.title}
-                  component={Link}
-                  to={page.route}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page.title}
-                </Button>
+                <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                  <Typography textAlign='center'>{page.title}</Typography>
+                </MenuItem>
               ))}
-            </Box>
-            {isMetaMaskInstalled() && (
-              <MenuItem onClick={handleCloseNavMenu}>
-                <Box sx={{ paddingRight: 1, display: 'flex' }}>
-                  <InsertEmoticonSharpIcon />
-                </Box>
-                <Typography textAlign='center'>
-                  Connected To Metamask
-                </Typography>
-              </MenuItem>
-            )}
-          </Toolbar>
-        </Container>
-      </AppBar>
-      <Box
-        sx={{
-          float: 'right',
-        }}
-      >
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={auth}
-                onChange={handleChange}
-                aria-label='login switch'
-              />
-            }
-            label={auth ? 'Connected' : 'Desconnected'}
-          />
-        </FormGroup>
-      </Box>
-    </>
+            </Menu>
+          </Box>
+          <Typography
+            variant='h6'
+            noWrap
+            component='div'
+            sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
+          >
+            LOGO
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            {pages.map((page) => (
+              <Button
+                key={page.title}
+                component={Link}
+                to={page.route}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                {page.title}
+              </Button>
+            ))}
+          </Box>
+          {isMetaMaskInstalled() && (
+            <MenuItem onClick={handleCloseNavMenu}>
+              <Box sx={{ paddingRight: 1, display: 'flex' }}>
+                <InsertEmoticonSharpIcon />
+              </Box>
+              <Typography textAlign='center'>Connected To Metamask</Typography>
+            </MenuItem>
+          )}
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 }

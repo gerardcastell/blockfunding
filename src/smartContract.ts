@@ -10,7 +10,6 @@ const abi: AbiItem[] = [
         name: '_crowdFundingAddress',
         type: 'address',
       },
-      { internalType: 'uint256', name: '_amount', type: 'uint256' },
     ],
     name: 'claim',
     outputs: [],
