@@ -9,7 +9,7 @@ import BasicTable from './Table';
 export default function ProjectsList() {
 
     useEffect(() => {
-        setProjectInfo();
+        getProjects();
     }, [])
 
     const [state, setState] = useState<IProjectInfo>({
@@ -20,18 +20,26 @@ export default function ProjectsList() {
         progress: 0
     });
 
-    const setProjectInfo = async () => {
+    async function getProjects() {
+        const projectAddresses = await smartContract.methods.crowdfundingList().call();
+        console.log(projectAddresses);
+        // for(const projectAddress of projectAddresses) {
+        //     const projectInfo = await smartContract.methods.projects().call(projectAddress);
+        //     setProjectInfo(projectInfo);
+        // }
+    }
+
+    async function setProjectInfo(project: any){
         const projectId = "1";
-        console.log(await smartContract.methods.projects("0x5e8DeE6d254a3e26B27BE8215111bEfA982A6d7F").call())
-        // const balance = await smartContract.methods.balance().call();
-        // const ethGoal = await smartContract.methods.ethGoal().call();
-        // const deadline = await smartContract.methods.deadline().call();
-        // const progress = balance / ethGoal * 100;
-        // changeState(setState,"projectId", projectId);
-        // changeState(setState,"ethGoal", weiToEth(ethGoal) as number);
-        // changeState(setState,"balance", weiToEth(balance) as number);
-        // changeState(setState,"deadline", deadline);
-        // changeState(setState,"progress",  progress);
+        const balance = await smartContract.methods.balance().call();
+        const ethGoal = await smartContract.methods.ethGoal().call();
+        const deadline = await smartContract.methods.deadline().call();
+        const progress = balance / ethGoal * 100;
+        changeState(setState,"projectId", projectId);
+        changeState(setState,"ethGoal", weiToEth(ethGoal) as number);
+        changeState(setState,"balance", weiToEth(balance) as number);
+        changeState(setState,"deadline", deadline);
+        changeState(setState,"progress",  progress);
     };
 
     const rows = [{

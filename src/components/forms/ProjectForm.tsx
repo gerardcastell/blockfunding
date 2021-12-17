@@ -1,6 +1,5 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { smartContract } from '../../smartContract';
-import { ethToWei, MILLIS_X_DAYS } from '../../utils/exchanges';
 import { IAccount } from '../shared/IAccount';
 
 type Inputs = {

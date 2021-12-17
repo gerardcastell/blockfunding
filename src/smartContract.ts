@@ -19,12 +19,19 @@ const abi: AbiItem[] = [
   },
   {
     inputs: [
-      { internalType: 'uint256', name: '_days', type: 'uint256' },
+      { internalType: 'uint256', name: '_segons', type: 'uint256' },
       { internalType: 'uint256', name: '_ethGoal', type: 'uint256' },
     ],
     name: 'createNewProject',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'crowdfundingList',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -53,7 +60,7 @@ const abi: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address payable', name: '_to', type: 'address' }],
+    inputs: [],
     name: 'withdrawFunds',
     outputs: [],
     stateMutability: 'nonpayable',
