@@ -52,7 +52,7 @@ export default function Header() {
     setAnchorElUser(null);
   };
   return (
-    <AppBar position='static'>
+    <AppBar position='static' sx={{ backgroundColor: '#26395c' }}>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <Typography

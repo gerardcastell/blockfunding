@@ -23,10 +23,10 @@ input {
   margin-bottom: 15px;
   font-size: 20px;
   border-color: #b3b3b3;
-	border-style: solid;
+  border-style: solid;
 }
 
-button[type="submit"],
+button[type='submit'],
 .button {
   position: relative;
   background: #ec5990;
@@ -57,13 +57,13 @@ button[type="submit"],
   grid-gap: 20px;
 }
 
-button[type="submit"]:hover,
-button[type="button"]:hover {
+button[type='submit']:hover,
+button[type='button']:hover {
   background: #bf1650;
   color: white;
 }
 
-button[type="submit"]:active {
+button[type='submit']:active {
   transition: 0.3s all;
   top: 2px;
 }
@@ -93,6 +93,6 @@ button[type="submit"]:active {
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: #04AA6D;
+  background-color: #04aa6d;
   color: white;
 }
