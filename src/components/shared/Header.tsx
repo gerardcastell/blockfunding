@@ -121,37 +121,9 @@ export default function Header() {
                 </Button>
               ))}
             </Box>
-            {isMetaMaskInstalled() && (
-              <MenuItem onClick={handleCloseNavMenu}>
-                <Box sx={{ paddingRight: 1, display: 'flex' }}>
-                  <InsertEmoticonSharpIcon />
-                </Box>
-                <Typography textAlign='center'>
-                  Connected To Metamask
-                </Typography>
-              </MenuItem>
-            )}
           </Toolbar>
         </Container>
       </AppBar>
-      <Box
-        sx={{
-          float: 'right',
-        }}
-      >
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={auth}
-                onChange={handleChange}
-                aria-label='login switch'
-              />
-            }
-            label={auth ? 'Connected' : 'Desconnected'}
-          />
-        </FormGroup>
-      </Box>
     </>
   );
 }

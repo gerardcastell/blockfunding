@@ -6,7 +6,6 @@ import { IProjectInfo } from './shared/types';
 export default function ProgressBar({ projectInfo }: { projectInfo: any }) {
   const [progress, setProgress] = useState<number>(projectInfo.progress);
   // const [deadline, setDeadline] = useState<number>(projectInfo.deadline);
-  console.log(weiToEth(projectInfo.balance), weiToEth(projectInfo.ethGoal));
   useEffect(() => {
     setProgress((projectInfo.balance / projectInfo.ethGoal) * 100);
   }, [projectInfo]);
