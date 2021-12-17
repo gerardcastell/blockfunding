@@ -18,6 +18,7 @@ contract CrowdFunding {
         uint256 ethGoal;
         // Deadline in seconds (unix timestamp)
         uint256 deadline;
+        
         // Amount that every user has contributed
         //mapping(address => uint256) balanceReceived;
         // Amount of ETH each org can claim per claimable event
@@ -115,22 +116,21 @@ contract CrowdFunding {
         uint256 idx = addressMap[_address];
         return projects[idx];
     }
-function claim(address _crowdFundingAddress, uint256 _amount) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+function claim(address _crowdFundingAddress) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         require(
            donationLedger[msg.sender][_crowdFundingAddress] > 0,
            "Donation already claimed"
         );
-
-        _amount = _amount * (1 ether); // Convert to wei
+        uint256 _amount = donationLedger[msg.sender][_crowdFundingAddress];
        require(
             donationLedger[msg.sender][_crowdFundingAddress] - _amount >= 0,
            "Not enough funds"
        );
 
-        donationLedger[msg.sender][_crowdFundingAddress] -= _amount;
         projects[idx].balance -= _amount;
+        donationLedger[msg.sender][_crowdFundingAddress] = 0;
 
         // Send funds to the donator address
         payable(msg.sender).transfer(_amount);
