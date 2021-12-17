@@ -18,7 +18,8 @@ contract CrowdFunding {
         uint256 ethGoal;
         // Deadline in seconds (unix timestamp)
         uint256 deadline;
-        
+        // Bool to show if crowdfunding is sended to the creator
+        bool claimed; 
         // Amount that every user has contributed
         //mapping(address => uint256) balanceReceived;
         // Amount of ETH each org can claim per claimable event
@@ -66,6 +67,12 @@ contract CrowdFunding {
         _;
     }
 
+    modifier isNotClaimed (address _crowdFundingAddress) {
+        uint256 idx = getIndexByAddress(_crowdFundingAddress);
+        require(projects[idx].claimed == false, "Funding is already claimed");
+        _;
+    }
+
     //PRIVATE FUNCTIONS
     function removeByIndex(uint i) private{
         while (i<projects.length-1) {
@@ -96,13 +103,13 @@ contract CrowdFunding {
         newProject.title = _title;
         newProject.ethGoal = _ethGoal * (1 ether);
         newProject.deadline = block.timestamp + _seconds;
+        newProject.claimed = false;
          
         addressMap[msg.sender]=projects.length -1;
     }
 
     function makeDonation(address _crowdFundingAddress) public payable isNotOwner(msg.sender) inTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress){
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
-     
         projects[idx].balance += msg.value;
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
     }
@@ -136,7 +143,9 @@ function claim(address _crowdFundingAddress) public notInTime(_crowdFundingAddre
         payable(msg.sender).transfer(_amount);
     }
    
-    function withdrawFunds() public isOwner(msg.sender) isAchieved(msg.sender) {
-        payable(msg.sender).transfer(address(this).balance);       
+    function withdrawFunds() public isOwner(msg.sender) isAchieved(msg.sender) isNotClaimed(msg.sender) {
+        payable(msg.sender).transfer(address(this).balance);     
+        uint256 idx = getIndexByAddress(msg.sender);
+        projects[idx].claimed = true;
     }
 }
