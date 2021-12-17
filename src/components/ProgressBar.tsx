@@ -3,22 +3,18 @@ import { useEffect, useState } from 'react';
 import { weiToEth } from '../utils/exchanges';
 import { IProjectInfo } from './shared/types';
 
-export default function ProgressBar({
-  projectInfo,
-}: {
-  projectInfo: IProjectInfo;
-}) {
-  const [progress, setPercent] = useState<number>(projectInfo.progress);
+export default function ProgressBar({ projectInfo }: { projectInfo: any }) {
+  const [progress, setProgress] = useState<number>(projectInfo.progress);
   // const [deadline, setDeadline] = useState<number>(projectInfo.deadline);
-
+  console.log(weiToEth(projectInfo.balance), weiToEth(projectInfo.ethGoal));
   useEffect(() => {
-    setPercent((projectInfo.balance / projectInfo.ethGoal) * 100);
+    setProgress((projectInfo.balance / projectInfo.ethGoal) * 100);
   }, [projectInfo]);
 
   return (
     <div style={{ marginBottom: '2rem' }}>
       <h2 style={{ textAlign: 'center', fontWeight: 'bold' }}>{`${
-        projectInfo.balance >= projectInfo.ethGoal
+        parseFloat(projectInfo.balance) >= parseFloat(projectInfo.ethGoal)
           ? '100'
           : progress
       }

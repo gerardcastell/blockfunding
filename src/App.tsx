@@ -17,31 +17,45 @@ declare global {
 }
 
 export default function App() {
-  const [metaMaskAccounts, setMetaMaskAccounts] = useState<string[]>([]);
+  const [metaMaskAccount, setMetaMaskAccount] = useState<string>('');
 
   useEffect(() => {
-
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
-      fetchAccounts(window.web3, setMetaMaskAccounts);
+      getAccounts();
       window.ethereum.on('accountsChanged', function (accounts: any) {
-        fetchAccounts(window.web3, setMetaMaskAccounts);
+        setMetaMaskAccount(accounts[0]);
       });
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
   }, []);
 
+  const getAccounts = async () => {
+    // const accountNumbers = await window.web3.eth.getAccounts();
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+    const newAccount = accounts[0];
+    setMetaMaskAccount(newAccount);
+  };
+
   return (
     <>
       <BrowserRouter>
         <Header />
-        <Container maxWidth="lg">
+        <Container maxWidth='lg'>
           <Routes>
-            <Route path="/" element={<ProjectsList />} />
-            <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]} />} />
-            <Route path="/:id/donate" element={<Donation userAccount={metaMaskAccounts[0]} />} />
+            <Route path='/' element={<ProjectsList />} />
+            <Route
+              path='/create'
+              element={<Project userAccount={metaMaskAccount} />}
+            />
+            <Route
+              path='/:id/donate'
+              element={<Donation userAccount={metaMaskAccount} />}
+            />
           </Routes>
         </Container>
       </BrowserRouter>

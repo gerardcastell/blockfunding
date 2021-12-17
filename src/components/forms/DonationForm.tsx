@@ -19,21 +19,13 @@ export default function DonationForm({
   projectId: string;
   stateSetter: React.Dispatch<React.SetStateAction<any>>;
 }) {
-  const { ethereum } = window;
-  const [currentAccount, setCurrentAccount] = useState<string>(incomingAccount);
   const { register, handleSubmit, reset } = useForm<Inputs>();
-
-  useEffect(() => {
-    ethereum.on('accountsChanged', function (accounts: any) {
-      setCurrentAccount(accounts[0]);
-    });
-  }, []);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       await smartContract.methods
         .makeDonation(projectId)
-        .send({ from: currentAccount, value: ethToWei(data.amount) });
+        .send({ from: incomingAccount, value: ethToWei(data.amount) });
       alert('Donation processed!');
       const projectInfo = await smartContract.methods
         .getProject(projectId)

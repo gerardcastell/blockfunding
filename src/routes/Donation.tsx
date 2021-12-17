@@ -8,14 +8,10 @@ import { useParams } from 'react-router-dom';
 import ClaimButton from '../components/forms/ClaimButton';
 
 export default function Donation({ userAccount }: { userAccount: string }) {
-  const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
-  const { ethereum } = window;
+  // const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
 
   useEffect(() => {
     setProjectInfo();
-    ethereum.on('accountsChanged', function (accounts: any) {
-      setCurrentAccount(accounts[0]);
-    });
   }, []);
 
   const { id } = useParams();
@@ -44,8 +40,8 @@ export default function Donation({ userAccount }: { userAccount: string }) {
         projectId={state.owner}
         stateSetter={setState}
       />
-      <ClaimButton userAccount={currentAccount}/>
-      <WithdrawButton userAccount={currentAccount} />
+      <ClaimButton userAccount={userAccount} />
+      <WithdrawButton userAccount={userAccount} />
     </>
   );
 }
