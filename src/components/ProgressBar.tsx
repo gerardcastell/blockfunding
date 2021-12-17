@@ -20,7 +20,7 @@ export default function ProgressBar({
       <h2 style={{ textAlign: 'center', fontWeight: 'bold' }}>{`${
         projectInfo.balance >= projectInfo.ethGoal
           ? '100'
-          : (projectInfo.balance * 100) / projectInfo.ethGoal
+          : progress
       }
                 % already raised!`}</h2>
       <Line percent={progress} strokeWidth={1} strokeColor={'#ec5990'}></Line>

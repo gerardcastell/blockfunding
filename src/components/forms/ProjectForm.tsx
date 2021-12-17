@@ -13,8 +13,8 @@ export default function ProjectForm({ userAccount }: { userAccount: string }) {
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const millisDeadline = new Date(data.deadline).getTime();
-      await smartContract.methods.createProject(data.title, data.goalAmount, millisDeadline / 1000).send({ from: userAccount, gas: 3000000 });
+      // const millisDeadline = new Date(data.deadline).getTime();
+      await smartContract.methods.createProject(data.title, data.goalAmount, data.deadline).send({ from: userAccount, gas: 3000000 });
       alert("Project created!");
       reset({title: "", goalAmount: 0, deadline: ""});
     } catch (error) {
@@ -42,12 +42,12 @@ export default function ProjectForm({ userAccount }: { userAccount: string }) {
         type="number"
         required
       />
-      <input
+        <input
         {...register('deadline')}
         placeholder='Project deadline'
         autoComplete='off'
         key='deadline'
-        type='date'
+        // type='date'
         required
       />
       <button type="submit">Create</button>
