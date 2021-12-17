@@ -33,7 +33,6 @@ export default function App() {
   }, []);
 
   const getAccounts = async () => {
-    // const accountNumbers = await window.web3.eth.getAccounts();
     const accounts = await window.ethereum.request({
       method: 'eth_requestAccounts',
     });
