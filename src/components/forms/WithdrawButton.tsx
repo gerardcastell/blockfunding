@@ -15,6 +15,6 @@ export default function WithdrawButton({ userAccount }: {
   };
 
   return (
-    <button type="submit" onClick={handleWithdraw}>Withdraw the funds</button>
+    <button type="submit" onClick={handleWithdraw}>Withdraw the funds (OWNER)</button>
   );
 }

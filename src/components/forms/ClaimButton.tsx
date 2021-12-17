@@ -15,6 +15,6 @@ export default function ClaimButton({ userAccount }: {
   };
 
   return (
-    <button type="submit" onClick={handleClaim}>Claim</button>
+    <button type="submit" onClick={handleClaim}>Claim (PATRON)</button>
   );
 }

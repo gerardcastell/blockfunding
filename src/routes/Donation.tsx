@@ -5,6 +5,7 @@ import { secondsToMillis } from '../utils/exchanges';
 import { smartContract } from '../smartContract';
 import WithdrawButton from '../components/forms/WithdrawButton';
 import { useParams } from 'react-router-dom';
+import ClaimButton from '../components/forms/ClaimButton';
 
 export default function Donation({ userAccount }: { userAccount: string }) {
   const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
@@ -43,6 +44,7 @@ export default function Donation({ userAccount }: { userAccount: string }) {
         projectId={state.owner}
         stateSetter={setState}
       />
+      <ClaimButton userAccount={currentAccount}/>
       <WithdrawButton userAccount={currentAccount} />
     </>
   );
