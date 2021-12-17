@@ -19,12 +19,12 @@ export default function BasicTable({
       <Table sx={{ minWidth: 650 }} aria-label='simple table'>
         <TableHead>
           <TableRow>
-            <TableCell align='right'>Id</TableCell>
-            <TableCell align='right'>Title</TableCell>
-            <TableCell align='right'>Goal (Ethers)</TableCell>
-            <TableCell align='right'>Progress</TableCell>
-            <TableCell align='right'>Deadline</TableCell>
-            <TableCell align='right'></TableCell>
+            <TableCell align="center">Id</TableCell>
+            <TableCell align="center">Title</TableCell>
+            <TableCell align="center">Goal (Ethers)</TableCell>
+            <TableCell align="center">Progress</TableCell>
+            <TableCell align="center">Closes on</TableCell>
+            <TableCell align="center"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -33,17 +33,17 @@ export default function BasicTable({
               key={row.owner}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell align='right'>{row.owner}</TableCell>
-              <TableCell align='right'>{row.title}</TableCell>
-              <TableCell align='right'>{weiToEth(row.ethGoal)}</TableCell>
-              <TableCell align='right'>
+              <TableCell align='center'>{row.owner}</TableCell>
+              <TableCell align='center'>{row.title}</TableCell>
+              <TableCell align='center'>{weiToEth(row.ethGoal)}</TableCell>
+              <TableCell align='center'>
                 {row.balance >= row.ethGoal
                   ? '100'
                   : (row.balance * 100) / row.ethGoal}
                 %
               </TableCell>
-              <TableCell align='right'>{row.deadline}</TableCell>
-              <TableCell align='right'>
+              <TableCell align="center">{new Date(row.deadline * 1000).toString()}</TableCell>
+              <TableCell align="center">
                 <Button component={Link} to={`/${row.owner}/donate`}>
                   Contribute
                 </Button>

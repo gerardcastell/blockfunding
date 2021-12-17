@@ -20,10 +20,14 @@ export default function App() {
   const [metaMaskAccounts, setMetaMaskAccounts] = useState<string[]>([]);
 
   useEffect(() => {
+
     if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
       window.ethereum.enable();
       fetchAccounts(window.web3, setMetaMaskAccounts);
+      window.ethereum.on('accountsChanged', function (accounts: any) {
+        fetchAccounts(window.web3, setMetaMaskAccounts);
+      });
     } else {
       alert('Please install MetaMask to use this dApp!');
     }
