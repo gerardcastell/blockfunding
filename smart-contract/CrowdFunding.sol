@@ -3,10 +3,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ * @title CrowdFunding
+ * @dev create and manage crowdfundings
  */
-contract Storage {
+contract CrowdFunding {
     struct Project {
         // Leader of the crowdfunding campaign
         address owner;
@@ -27,7 +27,7 @@ contract Storage {
     uint256 number;
     Project[] projects;
     mapping (address => uint256) addressMap;
-    mapping (address => mapping(address => uint256)) fundingLedger;
+    mapping (address => mapping(address => uint256)) donationLedger;
 
      modifier inTime(address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
@@ -65,6 +65,28 @@ contract Storage {
         _;
     }
 
+    //PRIVATE FUNCTIONS
+    function removeByIndex(uint i) private{
+        while (i<projects.length-1) {
+            projects[i] = projects[i+1];
+            i++;
+        }
+    }
+
+    function getIndexByAddress(address _address) private view returns(uint256){
+        return addressMap[_address];
+    }
+        
+    function deleteProject(address _address) private {
+        uint256 idx = addressMap[_address];
+        if (idx >= projects.length) return;
+        for (uint i = idx; i<projects.length-1; i++){
+            projects[i] = projects[i+1];
+        }
+        delete projects[projects.length-1];
+    }
+
+    //PUBLIC FUNCTIONS
     function createProject(string memory _title, uint256 _ethGoal, uint256 _seconds) public {
         Project storage newProject = projects.push();
         //Project({owner:msg.sender,balance:0, ethGoal:_ethGoal, deadline: block.timestamp + _seconds}); 
@@ -83,7 +105,7 @@ contract Storage {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
      
         projects[idx].balance += msg.value;
-        fundingLedger[msg.sender][_crowdFundingAddress] += msg.value;
+        donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
     }
 
 
@@ -96,9 +118,22 @@ contract Storage {
         return projects[idx];
     }
 
-    function getProjectsLength() public view returns(uint256){
-        return projects.length;
-    }
+    function claim(address _crowdFundingAddress, uint256 _amount) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+        // Check if the user has already claimed his funds
+        uint256 idx = getIndexByAddress(_crowdFundingAddress);
+        require(
+           donationLedger[msg.sender][_crowdFundingAddress] > 0,
+           "Donation already claimed"
+        );
+
+        _amount = _amount * (1 ether); // Convert to wei
+       require(
+            donationLedger[msg.sender][_crowdFundingAddress] - _amount >= 0,
+           "Not enough funds"
+       );
+
+        donationLedger[msg.sender][_crowdFundingAddress] -= _amount;
+        projects[idx].balance -= _amount;
 
     function removeByIndex(uint i) private{
         while (i<projects.length-1) {
