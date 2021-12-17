@@ -14,17 +14,23 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { Link } from 'react-router-dom';
-export default function Header() {
 
-  const pages : {title: string, route: string;}[] = [
-    {title: 'List', route: "/"}, 
-    {title: 'Create a Crowdfunding', route: "/create"}, 
-    {title: 'About us', route: '/about'}
+export default function Header() {
+  const pages: { title: string; route: string }[] = [
+    { title: 'List', route: '/' },
+    { title: 'Create a Crowdfunding', route: '/create' },
+    { title: 'About us', route: '/about' },
   ];
   const [auth, setAuth] = React.useState(true);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
+
+  const isMetaMaskInstalled = () => {
+    //Have to check the ethereum binding on the window object to see if it's installed
+    const { ethereum } = window;
+    return Boolean(ethereum && ethereum.isMetaMask);
+  };
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
@@ -115,7 +121,7 @@ export default function Header() {
                 </Button>
               ))}
             </Box>
-            {auth && (
+            {isMetaMaskInstalled() && (
               <MenuItem onClick={handleCloseNavMenu}>
                 <Box sx={{ paddingRight: 1, display: 'flex' }}>
                   <InsertEmoticonSharpIcon />
