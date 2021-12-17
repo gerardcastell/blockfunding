@@ -1,20 +1,22 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { smartContract } from '../../smartContract';
-import { IAccount } from '../shared/IAccount';
 
 type Inputs = {
+  title: string;
   deadline: string;
   goalAmount: number;
 };
 
 
-export default function ProjectForm({ userAccount }: { userAccount: IAccount }) {
+export default function ProjectForm({ userAccount }: { userAccount: string }) {
 
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const millisDeadline = new Date(data.deadline).getTime();
-      await smartContract.methods.createNewProject(millisDeadline / 1000, data.goalAmount).send({ from: userAccount.address });
+      await smartContract.methods.createProject(data.title, data.goalAmount, millisDeadline / 1000).send({ from: userAccount, gas: 3000000 });
+      alert("Project created!");
+      reset({title: "", goalAmount: 0, deadline: ""});
     } catch (error) {
       alert(error);
     }
@@ -25,20 +27,28 @@ export default function ProjectForm({ userAccount }: { userAccount: IAccount }) 
     <form onSubmit={handleSubmit(onSubmit)} key='origin'>
       <br />
       <input
+        {...register('title')}
+        placeholder='Project title'
+        autoComplete='off'
+        key='title'
+        required
+      />
+      <input
         {...register('goalAmount')}
         placeholder='Goal amount (ETH)'
         autoComplete='off'
         key='goalAmount'
-        required
+        step={1}
         type="number"
+        required
       />
       <input
         {...register('deadline')}
         placeholder='Project deadline'
         autoComplete='off'
         key='deadline'
-        required
         type='date'
+        required
       />
       <button type="submit">Create</button>
     </form>

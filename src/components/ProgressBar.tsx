@@ -1,6 +1,6 @@
 import { Line } from 'rc-progress';
 import { useEffect, useState } from 'react';
-import { IProjectInfo } from './types/project';
+import { IProjectInfo } from './shared/types';
 
 export default function ProgressBar({ projectInfo }: { projectInfo: IProjectInfo }) {
 

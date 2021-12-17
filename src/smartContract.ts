@@ -19,18 +19,52 @@ const abi: AbiItem[] = [
   },
   {
     inputs: [
-      { internalType: 'uint256', name: '_segons', type: 'uint256' },
+      { internalType: 'string', name: '_title', type: 'string' },
       { internalType: 'uint256', name: '_ethGoal', type: 'uint256' },
+      { internalType: 'uint256', name: '_seconds', type: 'uint256' },
     ],
-    name: 'createNewProject',
+    name: 'createProject',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    name: 'crowdfundingList',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
+    name: 'getProject',
+    outputs: [
+      {
+        components: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'string', name: 'title', type: 'string' },
+          { internalType: 'uint256', name: 'balance', type: 'uint256' },
+          { internalType: 'uint256', name: 'ethGoal', type: 'uint256' },
+          { internalType: 'uint256', name: 'deadline', type: 'uint256' },
+        ],
+        internalType: 'struct CrowdFunding.Project',
+        name: '',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getProjects',
+    outputs: [
+      {
+        components: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'string', name: 'title', type: 'string' },
+          { internalType: 'uint256', name: 'balance', type: 'uint256' },
+          { internalType: 'uint256', name: 'ethGoal', type: 'uint256' },
+          { internalType: 'uint256', name: 'deadline', type: 'uint256' },
+        ],
+        internalType: 'struct CrowdFunding.Project[]',
+        name: '',
+        type: 'tuple[]',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },
@@ -45,18 +79,6 @@ const abi: AbiItem[] = [
     name: 'makeDonation',
     outputs: [],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'projects',
-    outputs: [
-      { internalType: 'address', name: 'owner', type: 'address' },
-      { internalType: 'uint256', name: 'balance', type: 'uint256' },
-      { internalType: 'uint256', name: 'ethGoal', type: 'uint256' },
-      { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {

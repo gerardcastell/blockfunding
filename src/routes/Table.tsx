@@ -26,16 +26,16 @@ export default function BasicTable({ rows }: { rows: { [key: string]: any }[] })
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow
-                            key={row.name}
+                            key={row.owner}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
-                            <TableCell align="right">{row.projectId}</TableCell>
+                            <TableCell align="right">{row.owner}</TableCell>
                             <TableCell align="right">{row.title}</TableCell>
-                            <TableCell align="right">{row.goalEth}</TableCell>
-                            <TableCell align="right">{row.progress}</TableCell>
+                            <TableCell align="right">{row.ethGoal}</TableCell>
+                            <TableCell align="right">{row.balance / row.ethGoal}</TableCell>
                             <TableCell align="right">{row.deadline}</TableCell>
                             <TableCell align="right">
-                                <Button component={Link} to={`/${row.projectId}/donate`}>Contribute</Button>
+                                <Button component={Link} to={`/${row.owner}/donate`}>Contribute</Button>
                             </TableCell>
                         </TableRow>
                     ))}

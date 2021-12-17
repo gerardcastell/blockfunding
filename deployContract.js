@@ -28,13 +28,12 @@ function run() {
 function deployContract(contract, data) {
   contract
     .deploy({ 
-      data,
-      arguments: [30, 10]
+      data
     })
     .send({
       from: '0xe553eE64bbFF7B2D3012efB884e0887Aa364691C',
-      gas: 1500000,
-      gasPrice: '30000000000000',
+      gas: 3000000,
+      // gasPrice: '30000000000000',
     })
     .on('error', function (error) {
       throw new Error(error);

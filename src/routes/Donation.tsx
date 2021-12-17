@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react';
-import { IAccount } from '../components/shared/IAccount';
 import DonationForm from '../components/forms/DonationForm';
 import ProgressBar from '../components/ProgressBar';
-import { secondsToMillis, weiToEth } from '../utils/exchanges';
+import { secondsToMillis } from '../utils/exchanges';
 import { smartContract } from '../smartContract';
-import { IProjectInfo } from '../components/types/project';
-import { changeState } from '../utils/fetchAccounts';
 import WithdrawButton from '../components/forms/WithdrawButton';
+import { useParams } from 'react-router-dom';
 
-export default function Donation({ userAccount }: { userAccount: IAccount }) {
-
+export default function Donation({ userAccount }: { userAccount: string }) {
+  
+  const { ethereum } = window;
+  
   useEffect(() => {
     setProjectInfo();
-  }, [])
+    ethereum.on("accountsChanged", function (accounts: any) {
+      setCurrentAccount(accounts[0]);
+    })
+  }, []);
 
-  const [state, setState] = useState<IProjectInfo>({
+  const [currentAccount, setCurrentAccount] = useState<string>(userAccount);
+
+
+  const { id } = useParams();
+
+  const [state, setState] = useState<any>({
     projectId: "",
+    title: "",
     balance: 0,
     ethGoal: 0,
     deadline: 0,
@@ -23,23 +32,17 @@ export default function Donation({ userAccount }: { userAccount: IAccount }) {
   });
 
   const setProjectInfo = async () => {
-    const balance = await smartContract.methods.balance().call();
-    const ethGoal = await smartContract.methods.ethGoal().call();
-    const deadline = await smartContract.methods.deadline().call();
-    const progress = balance / ethGoal * 100;
-    changeState(setState, "ethGoal", parseFloat(weiToEth(ethGoal) as string));
-    changeState(setState, "balance", parseFloat(weiToEth(balance) as string));
-    changeState(setState, "deadline", parseInt(deadline));
-    changeState(setState, "progress", progress);
+    const projectInfo = await smartContract.methods.getProject(id).call();
+    setState(projectInfo);
   };
 
   return (
     <>
-      <h1>PROJECT TITLE</h1>
+      <h1>{state.title}</h1>
       <h3>{`Closes on ${new Date(secondsToMillis(state.deadline))}`}</h3>
       <ProgressBar projectInfo={state}></ProgressBar>
-      <DonationForm userAccount={userAccount} ethGoal={state.ethGoal} stateSetter={setState} />
-      <WithdrawButton userAccount={userAccount}/>
+      <DonationForm incomingAccount={userAccount} projectId={state.owner} stateSetter={setState} />
+      <WithdrawButton userAccount={currentAccount} />
     </>
   );
 }

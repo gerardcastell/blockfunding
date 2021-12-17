@@ -89,8 +89,6 @@ contract CrowdFunding {
     //PUBLIC FUNCTIONS
     function createProject(string memory _title, uint256 _ethGoal, uint256 _seconds) public {
         Project storage newProject = projects.push();
-        //Project({owner:msg.sender,balance:0, ethGoal:_ethGoal, deadline: block.timestamp + _seconds}); 
-        //projects.push(newProject);
 
         newProject.owner = msg.sender;
         newProject.balance = 0;
@@ -117,8 +115,7 @@ contract CrowdFunding {
         uint256 idx = addressMap[_address];
         return projects[idx];
     }
-
-    function claim(address _crowdFundingAddress, uint256 _amount) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+function claim(address _crowdFundingAddress, uint256 _amount) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         require(
@@ -135,30 +132,11 @@ contract CrowdFunding {
         donationLedger[msg.sender][_crowdFundingAddress] -= _amount;
         projects[idx].balance -= _amount;
 
-    function removeByIndex(uint i) private{
-        while (i<projects.length-1) {
-            projects[i] = projects[i+1];
-            i++;
-        }
+        // Send funds to the donator address
+        payable(msg.sender).transfer(_amount);
     }
-    
-    function deleteProject(address _address) public {
-        uint256 idx = addressMap[_address];
-       // detele projects[idx];
-       // removeByIndex(idx);
-
-        if (idx >= projects.length) return;
-
-        for (uint i = idx; i<projects.length-1; i++){
-            projects[i] = projects[i+1];
-        }
-        delete projects[projects.length-1];
-        //projects.length--;
-    
+   
+    function withdrawFunds() public isOwner(msg.sender) isAchieved(msg.sender) {
+        payable(msg.sender).transfer(address(this).balance);       
     }
-
-    function getIndexByAddress(address _address) private view returns(uint256){
-        return addressMap[_address];
-    }
- 
 }

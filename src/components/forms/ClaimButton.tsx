@@ -1,14 +1,13 @@
-import { IAccount } from '../shared/IAccount';
 import { smartContract } from '../../smartContract';
 
 
 export default function ClaimButton({ userAccount }: {
-  userAccount: IAccount,
+  userAccount: string,
 }) {
 
   async function handleClaim() {
     try {
-      await smartContract.methods.claim(userAccount.address).call();
+      await smartContract.methods.claim(userAccount).call();
       alert("Claim processed!")
     } catch (error) {
       alert(error);

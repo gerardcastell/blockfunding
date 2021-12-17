@@ -1,8 +1,8 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ethToWei, weiToEth } from '../../utils/exchanges';
-import { IAccount } from '../shared/IAccount';
 import { smartContract } from '../../smartContract';
 import { changeState } from '../../utils/fetchAccounts';
+import { useEffect, useState } from 'react';
 
 type Inputs = {
   originAccount: string;
@@ -10,20 +10,29 @@ type Inputs = {
   amount: string;
 };
 
-export default function DonationForm({ userAccount, stateSetter, ethGoal }: {
-  userAccount: IAccount,
-  ethGoal: number,
+export default function DonationForm({ incomingAccount, projectId, stateSetter }: {
+  incomingAccount: string,
+  projectId: string,
   stateSetter: React.Dispatch<React.SetStateAction<any>>
 }) {
+
+  const { ethereum } = window;
+  
+  useEffect(() => {
+    ethereum.on("accountsChanged", function (accounts: any) {
+      setCurrentAccount(accounts[0]);
+    })
+  }, [])
+
+  const [currentAccount, setCurrentAccount] = useState<string>(incomingAccount);
 
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await smartContract.methods.makeDonation().send({ from: userAccount.address, value: ethToWei(data.amount) })
+      await smartContract.methods.makeDonation(projectId).send({ from: currentAccount, value: ethToWei(data.amount) })
       alert("Donation processed!")
-      const balance = await smartContract.methods.balance().call();
-      changeState(stateSetter, "balance", weiToEth(balance));
-      changeState(stateSetter, "progress", weiToEth(balance) as number / ethGoal);
+      const projectInfo = await smartContract.methods.getProject(projectId).call();
+      stateSetter(projectInfo);
     } catch (error) {
       alert(error);
     } finally {

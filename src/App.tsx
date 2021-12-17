@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Web3 from 'web3';
 import './App.css';
 import Header from './components/shared/Header';
-import { IAccount } from './components/shared/IAccount';
 import { fetchAccounts } from './utils/fetchAccounts';
 import ProjectsList from './routes/ProjectsList';
 import Donation from './routes/Donation';
@@ -18,7 +17,7 @@ declare global {
 }
 
 export default function App() {
-  const [metaMaskAccounts, setMetaMaskAccounts] = useState<IAccount[]>([]);
+  const [metaMaskAccounts, setMetaMaskAccounts] = useState<string[]>([]);
 
   useEffect(() => {
     if (window.web3) {
@@ -34,7 +33,7 @@ export default function App() {
     <>
       <BrowserRouter>
         <Header />
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <Routes>
             <Route path="/" element={<ProjectsList />} />
             <Route path="/create" element={<Project userAccount={metaMaskAccounts[0]} />} />

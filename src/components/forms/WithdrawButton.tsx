@@ -1,14 +1,13 @@
-import { IAccount } from '../shared/IAccount';
 import { smartContract } from '../../smartContract';
 
 
 export default function WithdrawButton({ userAccount }: {
-  userAccount: IAccount,
+  userAccount: string,
 }) {
 
   async function handleWithdraw() {
     try {
-      await smartContract.methods.claim(userAccount.address).call();
+      await smartContract.methods.claim(userAccount).call();
       alert("Withdrawal processed")
     } catch (error) {
       alert(error);
