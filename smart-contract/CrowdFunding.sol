@@ -22,11 +22,8 @@ contract CrowdFunding {
         bool claimed; 
         // Amount that every user has contributed
         //mapping(address => uint256) balanceReceived;
-        // Amount of ETH each org can claim per claimable event
-        //mapping(address => mapping(uint256 => bool)) isDonationClaimed;
     }
 
-    uint256 number;
     Project[] projects;
     mapping (address => uint256) addressMap;
     mapping (address => mapping(address => uint256)) donationLedger;
@@ -114,7 +111,6 @@ contract CrowdFunding {
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
     }
 
-
     function getProjects() public view returns(Project[] memory){
         return projects;
     }
@@ -123,19 +119,16 @@ contract CrowdFunding {
         uint256 idx = addressMap[_address];
         return projects[idx];
     }
-function claim(address _crowdFundingAddress) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+
+    function claim(address _crowdFundingAddress) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         require(
            donationLedger[msg.sender][_crowdFundingAddress] > 0,
            "Donation already claimed"
         );
+        
         uint256 _amount = donationLedger[msg.sender][_crowdFundingAddress];
-       require(
-            donationLedger[msg.sender][_crowdFundingAddress] - _amount >= 0,
-           "Not enough funds"
-       );
-
         projects[idx].balance -= _amount;
         donationLedger[msg.sender][_crowdFundingAddress] = 0;
 
