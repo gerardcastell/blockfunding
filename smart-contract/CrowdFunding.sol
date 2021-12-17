@@ -3,10 +3,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
- * @title Storage
+ * @title BlockFunding
  * @dev Store & retrieve value in a variable
  */
-contract Storage {
+contract BlockFunding {
     struct Project {
         // Leader of the crowdfunding campaign
         address owner;
