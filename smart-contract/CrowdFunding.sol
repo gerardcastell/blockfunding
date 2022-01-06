@@ -28,45 +28,44 @@ contract CrowdFunding {
     mapping (address => uint256) addressMap;
     mapping (address => mapping(address => uint256)) donationLedger;
 
-     modifier inTime(address _crowdFundingAddress) {
+
+    modifier inTime(bool isInTime, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
-        require(block.timestamp <= projects[idx].deadline, "Donations are closed");
+        if(isInTime){
+            require(block.timestamp <= projects[idx].deadline, "Donations are closed");
+        }else{
+            require(block.timestamp > projects[idx].deadline, "Donations are still ongoing");
+        }
         _;
     }
 
-    modifier notInTime(address _crowdFundingAddress) {
-        uint256 idx = getIndexByAddress(_crowdFundingAddress);
-        require(block.timestamp > projects[idx].deadline, "Donations are still ongoing");
-        _;
-    }
-
-    modifier isOwner(address _ownerAddr) {
+    modifier onlyOwner(bool isOwner, address _ownerAddr) {
         uint256 idx = getIndexByAddress(_ownerAddr);
-        require(msg.sender == projects[idx].owner, "Caller is not the founder");
+        if(isOwner){
+            require(msg.sender == projects[idx].owner, "Caller is not the founder");
+        }else{
+            require(msg.sender != projects[idx].owner, "Caller is the founder");
+        }
         _;
     }
 
-    modifier isNotOwner(address _ownerAddr) {
-        uint256 idx = getIndexByAddress(_ownerAddr);
-        require(msg.sender != projects[idx].owner, "Caller is the founder");
-        _;
-    }
-
-    modifier isAchieved(address _crowdFundingAddress) {
+    modifier achieved(bool isAchieved, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
-        require(projects[idx].balance >= projects[idx].ethGoal, "Goal is not achieved");
+        if(isAchieved){
+            require(projects[idx].balance >= projects[idx].ethGoal, "Goal is not achieved");
+        }else{
+            require(projects[idx].balance < projects[idx].ethGoal, "Goal is achieved");
+        }
         _;
     }
 
-    modifier isNotAchieved(address _crowdFundingAddress) {
+    modifier claimed (bool isClaimed, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
-        require(projects[idx].balance < projects[idx].ethGoal, "Goal is achieved");
-        _;
-    }
-
-    modifier isNotClaimed (address _crowdFundingAddress) {
-        uint256 idx = getIndexByAddress(_crowdFundingAddress);
-        require(projects[idx].claimed == false, "Funding is already claimed");
+        if(isClaimed){
+            require(projects[idx].claimed == true, "Funding is already claimed");
+        }else{
+            require(projects[idx].claimed == false, "Funding is not claimed yet");
+        }
         _;
     }
 
@@ -105,7 +104,7 @@ contract CrowdFunding {
         addressMap[msg.sender]=projects.length -1;
     }
 
-    function makeDonation(address _crowdFundingAddress) public payable isNotOwner(msg.sender) inTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress){
+    function makeDonation(address _crowdFundingAddress) public payable onlyOwner(false, msg.sender) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress){
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         projects[idx].balance += msg.value;
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
@@ -120,7 +119,7 @@ contract CrowdFunding {
         return projects[idx];
     }
 
-    function claim(address _crowdFundingAddress) public notInTime(_crowdFundingAddress) isNotAchieved(_crowdFundingAddress) {
+    function claim(address _crowdFundingAddress) public inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         require(
@@ -136,7 +135,7 @@ contract CrowdFunding {
         payable(msg.sender).transfer(_amount);
     }
    
-    function withdrawFunds() public isOwner(msg.sender) isAchieved(msg.sender) isNotClaimed(msg.sender) {
+    function withdrawFunds() public onlyOwner(true, msg.sender) achieved(true, msg.sender) claimed(false, msg.sender) {
         payable(msg.sender).transfer(address(this).balance);     
         uint256 idx = getIndexByAddress(msg.sender);
         projects[idx].claimed = true;
