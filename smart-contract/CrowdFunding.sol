@@ -42,8 +42,8 @@ contract CrowdFunding {
         _;
     }
 
-    modifier onlyOwner(bool isOwner, address _ownerAddr) {
-        uint256 idx = getIndexByAddress(_ownerAddr);
+    modifier onlyOwner(bool isOwner, address _crowdFundingAddress) {
+        uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isOwner){
             require(msg.sender == projects[idx].owner, "Caller is not the founder");
         }else{
@@ -65,14 +65,14 @@ contract CrowdFunding {
     modifier fundraised (bool isPaid, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isPaid){
-            require(projects[idx].claimed == true, "Funding is already claimed");
+            require(projects[idx].claimed == true, "Funding is not claimed yet");
         }else{
-            require(projects[idx].claimed == false, "Funding is not claimed yet");
+            require(projects[idx].claimed == false, "Funding is already claimed");
         }
         _;
     }
 
-     modifier claimed (bool isClaimed, address _crowdFundingAddress) {
+    modifier claimed (bool isClaimed, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isClaimed){
             require(donationLedger[msg.sender][_crowdFundingAddress] == 0, "Donation not claimed yet.");
@@ -83,13 +83,6 @@ contract CrowdFunding {
     }
 
     //PRIVATE FUNCTIONS
-    function removeByIndex(uint i) private{
-        while (i<projects.length-1) {
-            projects[i] = projects[i+1];
-            i++;
-        }
-    }
-
     function getIndexByAddress(address _address) private view returns(uint256){
         return addressMap[_address];
     }
@@ -119,10 +112,10 @@ contract CrowdFunding {
         newProject.ethGoal = _ethGoal * (1 ether);
         newProject.deadline = block.timestamp + _seconds;
         newProject.claimed = false;
-         addressMap[projectId]=projects.length -1;
+        addressMap[projectId]=projects.length -1;
     }
 
-    function makeDonation(address _crowdFundingAddress) external payable onlyOwner(false, msg.sender) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
+    function makeDonation(address _crowdFundingAddress) external payable onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         projects[idx].balance += msg.value;
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
@@ -137,7 +130,7 @@ contract CrowdFunding {
         return projects[idx];
     }
 
-    function claim(address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress) {
+    function claim(address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress)  {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         uint256 _amount = donationLedger[msg.sender][_crowdFundingAddress];
@@ -147,11 +140,14 @@ contract CrowdFunding {
 
         // Send funds to the donator address
         payable(msg.sender).transfer(_amount);
+
     }
    
-    function withdrawFunds() external onlyOwner(true, msg.sender) achieved(true, msg.sender) fundraised(false, msg.sender) {
-        payable(msg.sender).transfer(address(this).balance);     
-        uint256 idx = getIndexByAddress(msg.sender);
+    function withdrawFundsOfProject(address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
+        uint256 idx = getIndexByAddress(_crowdFundingAddress);
+        uint256 amount = projects[idx].balance;
         projects[idx].claimed = true;
+      
+        payable(msg.sender).transfer(amount);     
     }
 }
