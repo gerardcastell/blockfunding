@@ -26,6 +26,9 @@ contract CrowdFunding {
     }
 
     // It is the array of Projects stored in the smart contract
+    // Initially, it was a mapping(address=>Project) but at the end we realised that was easier for us to deal with
+    // an array instead of a mapping that has nested a struct since the logic was pretty more simple regarding
+    // our knowledge with Solidity
     Project[] projects;
     
     // It assigns to each address of project a unique index position of the "projects" array aforedeclared
@@ -136,7 +139,8 @@ contract CrowdFunding {
         return projects[idx];
     }
 
-    // Pays to the sender the amount donated to a certain project
+    // Pays to the sender the amount donated to a certain project. To do so, it gets from the donation ledger the amount donated by that user to the selected project id. 
+    // Such an amount is removed from the ledger and also from the balance of the project, then is paid back to the sender.
     // Modifiers: deadline is past, the crowdfunding have not been achieved and finally, the user has not claimed the donation yet
     function claim(address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress)  {
         // Check if the user has already claimed his funds
@@ -151,13 +155,15 @@ contract CrowdFunding {
 
     }
    
-    // Pays the balance of the project to the initiator of the crowfunding
+    // Pays the balance of the project to the initiator of the crowfunding. It gets the amount raised and it is paid to the project creator.
+    // The project store that the funding is already paid and the balance now is 0.
     // Modifiers: Caller has to be the owner,goal has been achieved and the owner has not claimed the funding yet
     function withdrawFundsByProject(address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         uint256 amount = projects[idx].balance;
         projects[idx].claimed = true;
-      
+        projects[idx].balance = 0;
+
         payable(msg.sender).transfer(amount);     
     }
 }
