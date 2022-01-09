@@ -7,6 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev create and manage crowdfundings
  */
 contract CrowdFunding {
+    //Project is the struct that we will store the core data for each crowdfunding
     struct Project {
         // Title of the crowdfunding
         string title;
@@ -22,16 +23,18 @@ contract CrowdFunding {
         uint256 deadline;
         // Bool to show if crowdfunding is sended to the creator
         bool claimed; 
-      
-        //mapping(address => uint256) balanceReceived;
     }
 
+    // It is the array of Projects stored in the smart contract
     Project[] projects;
+    
+    // It assigns to each address of project a unique index position of the "projects" array aforedeclared
     mapping (address => uint256) addressMap;
-    // Amount that every user has contributed
+    
+    // Ledger with the amount that every user has contributed to a certain project
     mapping (address => mapping(address => uint256)) donationLedger;
 
-
+    // Checks the time of the deadline for the selected project address
     modifier inTime(bool isInTime, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isInTime){
@@ -42,6 +45,7 @@ contract CrowdFunding {
         _;
     }
 
+    // Checks if the sender is the owner of the selected project
     modifier onlyOwner(bool isOwner, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isOwner){
@@ -52,6 +56,7 @@ contract CrowdFunding {
         _;
     }
 
+    // Checks if the project received as param has achieved the goal initially defined
     modifier achieved(bool isAchieved, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isAchieved){
@@ -62,6 +67,7 @@ contract CrowdFunding {
         _;
     }
 
+    // Checks if the balance of the projects has been sent to the creator.
     modifier fundraised (bool isPaid, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isPaid){
@@ -72,6 +78,7 @@ contract CrowdFunding {
         _;
     }
 
+    //Checks if the amount donated to the project by the user has been claimed 
     modifier claimed (bool isClaimed, address _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         if(isClaimed){
@@ -82,28 +89,22 @@ contract CrowdFunding {
         _;
     }
 
-    //PRIVATE FUNCTIONS
+    // ******* PRIVATE FUNCTIONS ***********
+    // Get the index of the project in the "projects" array by an address
     function getIndexByAddress(address _address) private view returns(uint256){
         return addressMap[_address];
     }
-        
-    function deleteProject(address _address) private {
-        uint256 idx = getIndexByAddress(_address);
-        if (idx >= projects.length) return;
-        for (uint i = idx; i<projects.length-1; i++){
-            projects[i] = projects[i+1];
-        }
-        delete projects[projects.length-1];
-    }
 
-    function getRandom() private view returns (address) {
+    //Get a random address to be the key of a new project
+    function getRandomAddress() private view returns (address) {
         return address(uint160(uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp)))));
     } 
 
     //PUBLIC & EXTERNAL FUNCTIONS
+    // Creates a new project assigning the basic properties to the struct
     function createProject(string memory _title, uint256 _ethGoal, uint256 _seconds) external {
         Project storage newProject = projects.push();
-        address projectId = getRandom();
+        address projectId = getRandomAddress();
 
         newProject.id = projectId;
         newProject.owner = msg.sender;
@@ -115,21 +116,28 @@ contract CrowdFunding {
         addressMap[projectId]=projects.length -1;
     }
 
+    // Makes a donation to the referenced project address transfering the paid amount to the balance of the project
+    // It also stores in the donation ledger the amount donated to such a project
+    // Modifiers: Owner can not donate himself, donation must be before deadline and the crowdfunding can not be achieved yet
     function makeDonation(address _crowdFundingAddress) external payable onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         projects[idx].balance += msg.value;
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
     }
 
+    // Returns all the projects created in the smart contract
     function getProjects() external view returns(Project[] memory) {
         return projects;
     }
 
+    // Returns the project by address
     function getProject(address _address) external view returns(Project memory) {
         uint256 idx = getIndexByAddress(_address);
         return projects[idx];
     }
 
+    // Pays to the sender the amount donated to a certain project
+    // Modifiers: deadline is past, the crowdfunding have not been achieved and finally, the user has not claimed the donation yet
     function claim(address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress)  {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
@@ -143,7 +151,9 @@ contract CrowdFunding {
 
     }
    
-    function withdrawFundsOfProject(address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
+    // Pays the balance of the project to the initiator of the crowfunding
+    // Modifiers: Caller has to be the owner,goal has been achieved and the owner has not claimed the funding yet
+    function withdrawFundsByProject(address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         uint256 amount = projects[idx].balance;
         projects[idx].claimed = true;
