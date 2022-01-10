@@ -10,8 +10,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  */
 contract CrowdFunding {
 
+
     //Project is the struct that we will store the core data for each crowdfunding
-    struct Project {
+    struct Project {        
         // Title of the crowdfunding
         string title;
         // Project identifier
@@ -125,13 +126,13 @@ contract CrowdFunding {
     // Makes a donation to the referenced project address transfering the paid amount to the balance of the project
     // It also stores in the donation ledger the amount donated to such a project
     // Modifiers: Owner can not donate himself, donation must be before deadline and the crowdfunding can not be achieved yet
-    function makeDonation(IERC20 bfd_token, address _crowdFundingAddress) external payable onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
+    function makeDonation(IERC20 bfd_token, address _crowdFundingAddress, uint256 _amount) external onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
 
-        bfd_token.transferFrom(address(msg.sender), address(this), msg.value);
+        require(bfd_token.transferFrom(address(msg.sender),address(this),_amount),"transfer Failed");
         
-        projects[idx].balance += msg.value;
-        donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
+        projects[idx].balance += _amount;
+        donationLedger[msg.sender][_crowdFundingAddress] += _amount;
     }
 
     // Returns all the projects created in the smart contract
@@ -157,7 +158,6 @@ contract CrowdFunding {
         donationLedger[msg.sender][_crowdFundingAddress] = 0;
 
         // Send funds to the donator address
-        // payable(msg.sender).transfer(_amount);
         bfd_token.transferFrom(address(this),address(msg.sender), _amount);
     }
    
@@ -169,8 +169,7 @@ contract CrowdFunding {
         uint256 amount = projects[idx].balance;
         projects[idx].claimed = true;
         projects[idx].balance = 0;
-
-        // payable(msg.sender).transfer(amount);     
+    
         bfd_token.transferFrom(address(this), address(msg.sender), amount);        
     }
 
