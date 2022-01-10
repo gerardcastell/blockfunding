@@ -9,7 +9,9 @@ Contributors:
 * [@martiriera](https://github.com/martiriera)
 * [@sergio-gimenez](https://github.com/sergio-gimenez)
 
-TODO - Add a GIF/image of the frontend
+![img/project_funding.jpeg](./img/project_funding.jpeg)
+
+![img/project.jpeg](./img/project.jpeg)
 
 ## The BFD token
 
@@ -23,4 +25,23 @@ All the logic of the crowdfunding is deployed in the [Crowdfunding](smart-contra
 
 ## Deployment
 
-TODO - Explain the deployment process @martiriera
+Install dependencies by running:
+
+```source
+npm install
+```
+
+Note:
+`npm` was requiring sudo permissions to install packages and throwing errors all the time. I did the following steps to make it work:
+
+* [Completely uninstall node from the system](https://stackoverflow.com/questions/32426601/how-can-i-completely-uninstall-nodejs-npm-and-node-in-ubuntu) (this link was the only that truly completely removed node and npm from the system)
+
+* Install `node` **using [`nvm`](https://linuxize.com/post/how-to-install-node-js-on-ubuntu-20-04/)**. I installed the last LTS version of node.
+
+Then run the following commands to deploy the contracts:
+
+```source
+npm run run:all
+```
+
+This will compile the `Crowdfunding.sol` file and deploy the smart contract to the ganache blockchain when it is already up and working. Finally it sets up the front-end server.
