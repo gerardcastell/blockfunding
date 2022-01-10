@@ -2,11 +2,14 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 /**
  * @title CrowdFunding
  * @dev create and manage crowdfundings
  */
 contract CrowdFunding {
+
     //Project is the struct that we will store the core data for each crowdfunding
     struct Project {
         // Title of the crowdfunding
@@ -122,8 +125,11 @@ contract CrowdFunding {
     // Makes a donation to the referenced project address transfering the paid amount to the balance of the project
     // It also stores in the donation ledger the amount donated to such a project
     // Modifiers: Owner can not donate himself, donation must be before deadline and the crowdfunding can not be achieved yet
-    function makeDonation(address _crowdFundingAddress) external payable onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
+    function makeDonation(IERC20 bfd_token, address _crowdFundingAddress) external payable onlyOwner(false, _crowdFundingAddress) inTime(true, _crowdFundingAddress) achieved(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
+
+        bfd_token.transferFrom(address(msg.sender), address(this), msg.value);
+        
         projects[idx].balance += msg.value;
         donationLedger[msg.sender][_crowdFundingAddress] += msg.value;
     }
@@ -142,7 +148,7 @@ contract CrowdFunding {
     // Pays to the sender the amount donated to a certain project. To do so, it gets from the donation ledger the amount donated by that user to the selected project id. 
     // Such an amount is removed from the ledger and also from the balance of the project, then is paid back to the sender.
     // Modifiers: deadline is past, the crowdfunding have not been achieved and finally, the user has not claimed the donation yet
-    function claim(address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress)  {
+    function claim(IERC20 bfd_token, address _crowdFundingAddress) external inTime(false, _crowdFundingAddress) achieved(false, _crowdFundingAddress) claimed(false, _crowdFundingAddress)  {
         // Check if the user has already claimed his funds
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         uint256 _amount = donationLedger[msg.sender][_crowdFundingAddress];
@@ -151,19 +157,28 @@ contract CrowdFunding {
         donationLedger[msg.sender][_crowdFundingAddress] = 0;
 
         // Send funds to the donator address
-        payable(msg.sender).transfer(_amount);
-
+        // payable(msg.sender).transfer(_amount);
+        bfd_token.transferFrom(address(this),address(msg.sender), _amount);
     }
    
     // Pays the balance of the project to the initiator of the crowfunding. It gets the amount raised and it is paid to the project creator.
     // The project store that the funding is already paid and the balance now is 0.
     // Modifiers: Caller has to be the owner,goal has been achieved and the owner has not claimed the funding yet
-    function withdrawFundsByProject(address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
+    function withdrawFundsByProject(IERC20 bfd_token, address _crowdFundingAddress) public onlyOwner(true, _crowdFundingAddress) achieved(true, _crowdFundingAddress) fundraised(false, _crowdFundingAddress) {
         uint256 idx = getIndexByAddress(_crowdFundingAddress);
         uint256 amount = projects[idx].balance;
         projects[idx].claimed = true;
         projects[idx].balance = 0;
 
-        payable(msg.sender).transfer(amount);     
+        // payable(msg.sender).transfer(amount);     
+        bfd_token.transferFrom(address(this), address(msg.sender), amount);        
+    }
+
+    function getProjectBalance (IERC20 bfd_token, address _crowdFundingAddress) public view returns (uint256){
+        return bfd_token.balanceOf(_crowdFundingAddress);
+    }
+
+    function getTotalSupply (IERC20 bfd_token) public view returns (uint256) {
+        return bfd_token.totalSupply();
     }
 }
